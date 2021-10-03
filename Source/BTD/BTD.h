@@ -1,5 +1,10 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
 
-#pragma once
+#ifndef BTD_H
+#define BTD_H
 
-#include "CoreMinimal.h"
+#include "Core.h"
+#include  "Net/UnrealNetwork.h"
+#include "Online.h"
+
+#endif
