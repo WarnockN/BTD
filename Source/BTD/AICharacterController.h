@@ -27,7 +27,7 @@ public:
 
 	//How far the AI can see in a circle around it.
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "AI")
-	float sightRadius = 500.0f;
+	float sightRadius = 1500.0f;
 
 	//How long an object is kept in memory after it is detected
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "AI")
@@ -35,11 +35,11 @@ public:
 
 	//AI loses right after being 50 units out of sightRadius
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "AI")
-	float loseSightRadius = sightRadius + 50.0f;
+	float loseSightRadius = sightRadius + 200.0f;
 
 	//FOV of the AI in degrees
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "AI")
-	float fov = 90.0f;
+	float fov = 110.0f;
 
 	//Forward declaration of Unreal AI sight component
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "AI")

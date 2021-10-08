@@ -2,6 +2,8 @@
 
 
 #include "AICharacterController.h"
+#include "Waypoint.h"
+#include "AICharacter.h"
 #include "Perception/AIPerceptionComponent.h"
 #include "Perception/AISenseConfig_Sight.h"
 
@@ -51,7 +53,14 @@ void AAICharacterController::OnPossess(APawn* inPawn) {
 }
 
 void AAICharacterController::Tick(float deltaSeconds) {
+	Super::Tick(deltaSeconds);
 
+	AAICharacter* character = Cast<AAICharacter>(GetPawn());
+
+	if (character->nextWaypoint != nullptr) {
+		MoveToActor(character->nextWaypoint, 5.0f);
+		
+	}
 }
 
 FRotator AAICharacterController::GetControlRotation() const {
