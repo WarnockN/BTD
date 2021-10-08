@@ -15,7 +15,7 @@ UGameInfoInstance::UGameInfoInstance(const FObjectInitializer& objectInitializer
 }
 
 
-bool UGameInfoInstance::HostSession(TSharedPtr<const FUniqueNetId> userID, FName sessionName_, bool bIslAN_, bool bIsPresence_, int maxPlayers_) {
+bool UGameInfoInstance::HostSession(TSharedPtr<const FUniqueNetId> userID, FName sessionName_, bool bIslAN_, bool bIsPresence_, int32 maxPlayers_) {
 	//Get the online subsystem to work with
 	IOnlineSubsystem* const onlineSub = IOnlineSubsystem::Get();
 
@@ -256,57 +256,57 @@ void UGameInfoInstance::OnDestroySessionComplete(FName sessionName_, bool bWasSu
 	}
 }
 
-// void UGameInfoInstance::StartOnlineGame() {
-// 	//Create a local player to get userID
-// 	ULocalPlayer* const player = GetFirstGamePlayer();
-//
-// 	//Call HostSession function
-// 	HostSession(player->GetPreferredUniqueNetId(), GameSessionName, true, true, 4);
-// }
-//
-// void UGameInfoInstance::FindOnlineGame() {
-// 	//Create a local player to get userID
-// 	ULocalPlayer* const player = GetFirstGamePlayer();
-//
-// 	//Call FindSession function
-// 	FindSessions(player->GetPreferredUniqueNetId(), true, true);
-// }
-//
-// void UGameInfoInstance::JoinOnlineGame() {
-// 	ULocalPlayer* const player = GetFirstGamePlayer();
-//
-// 	// Just a SearchResult where we can save the one we want to use, for the case we find more than one!
-// 	FOnlineSessionSearchResult searchResult;
-//
-// 	// If the Array is not empty, we can go through it
-// 	if (sessionSearch->SearchResults.Num() > 0)
-// 	{
-// 		for (int32 i = 0; i < sessionSearch->SearchResults.Num(); i++)
-// 		{
-// 			// To avoid something crazy, we filter sessions from ourself
-// 			if (sessionSearch->SearchResults[i].Session.OwningUserId != player->GetPreferredUniqueNetId())
-// 			{
-// 				searchResult = sessionSearch->SearchResults[i];
-//
-// 				/*Once we found sounce a Session that is not ours, just join it.*/
-// 				JoinSession(player->GetPreferredUniqueNetId(), GameSessionName, searchResult);
-// 				break;
-// 			}
-// 		}
-// 	}	
-// }
-//
-// void UGameInfoInstance::DestroySessionAndLeaveGame() {
-// 	IOnlineSubsystem* onlineSub = IOnlineSubsystem::Get();
-// 	if (onlineSub)
-// 	{
-// 		IOnlineSessionPtr sessions = onlineSub->GetSessionInterface();
-//
-// 		if (sessions.IsValid())
-// 		{
-// 			sessions->AddOnDestroySessionCompleteDelegate_Handle(OnDestroySessionCompleteDelegate);
-//
-// 			sessions->DestroySession(GameSessionName);
-// 		}
-// 	}
-// }
+void UGameInfoInstance::StartOnlineGame() {
+	//Create a local player to get userID
+	ULocalPlayer* const player = GetFirstGamePlayer();
+
+	//Call HostSession function
+	HostSession(player->GetPreferredUniqueNetId().GetUniqueNetId(), GameSessionName, true, true, 4);
+}
+
+void UGameInfoInstance::FindOnlineGame() {
+	//Create a local player to get userID
+	ULocalPlayer* const player = GetFirstGamePlayer();
+
+	//Call FindSession function
+	FindSessions(player->GetPreferredUniqueNetId().GetUniqueNetId(), true, true);
+}
+
+void UGameInfoInstance::JoinOnlineGame() {
+	ULocalPlayer* const player = GetFirstGamePlayer();
+
+	// Just a SearchResult where we can save the one we want to use, for the case we find more than one!
+	FOnlineSessionSearchResult searchResult;
+
+	// If the Array is not empty, we can go through it
+	if (sessionSearch->SearchResults.Num() > 0)
+	{
+		for (int32 i = 0; i < sessionSearch->SearchResults.Num(); i++)
+		{
+			// To avoid something crazy, we filter sessions from ourself
+			if (sessionSearch->SearchResults[i].Session.OwningUserId != player->GetPreferredUniqueNetId())
+			{
+				searchResult = sessionSearch->SearchResults[i];
+
+				/*Once we found a Session that is not ours, just join it.*/
+				JoinSessions(player->GetPreferredUniqueNetId().GetUniqueNetId(), GameSessionName, searchResult);
+				break;
+			}
+		}
+	}	
+}
+
+void UGameInfoInstance::DestroySessionAndLeaveGame() {
+	IOnlineSubsystem* onlineSub = IOnlineSubsystem::Get();
+	if (onlineSub)
+	{
+		IOnlineSessionPtr sessions = onlineSub->GetSessionInterface();
+
+		if (sessions.IsValid())
+		{
+			sessions->AddOnDestroySessionCompleteDelegate_Handle(OnDestroySessionCompleteDelegate);
+
+			sessions->DestroySession(GameSessionName);
+		}
+	}
+}

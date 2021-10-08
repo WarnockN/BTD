@@ -15,6 +15,9 @@ public:
 	// Sets default values for this character's properties
 	AAICharacter();
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	class AWaypoint* nextWaypoint;
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;

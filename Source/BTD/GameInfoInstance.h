@@ -51,7 +51,7 @@ class BTD_API UGameInfoInstance : public UGameInstance
 	 * @param maxPlayers_ Maximum number of players allowed in session
 	 * @return 
 	 */
-	bool HostSession(TSharedPtr<const FUniqueNetId> userID_, FName sessionName_, bool bIslAN_, bool bIsPresence_, int maxPlayers_);
+	bool HostSession(TSharedPtr<const FUniqueNetId> userID_, FName sessionName_, bool bIslAN_, bool bIsPresence_, int32 maxPlayers_);
 
 	/**
 	 * Find an online session
@@ -104,15 +104,15 @@ class BTD_API UGameInfoInstance : public UGameInstance
 	 */
 	virtual void OnDestroySessionComplete(FName sessionName_, bool bWasSuccessful_);
 
-	// UFUNCTION(BlueprintCallable, Category = "Network")
-	// void StartOnlineGame();
-	//
-	// UFUNCTION(BlueprintCallable, Category = "Network")
-	// void FindOnlineGame();
-	//
-	// UFUNCTION(BlueprintCallable, Category = "Network")
-	// void JoinOnlineGame();
-	//
-	// UFUNCTION(BlueprintCallable, Category = "Network")
-	// void DestroySessionAndLeaveGame();
+	UFUNCTION(BlueprintCallable, Category = "Network")
+	void StartOnlineGame();
+	
+	UFUNCTION(BlueprintCallable, Category = "Network")
+	void FindOnlineGame();
+	
+	UFUNCTION(BlueprintCallable, Category = "Network")
+	void JoinOnlineGame();
+	
+	UFUNCTION(BlueprintCallable, Category = "Network")
+	void DestroySessionAndLeaveGame();
 };
