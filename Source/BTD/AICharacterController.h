@@ -27,7 +27,7 @@ public:
 
 	//How far the AI can see in a circle around it.
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "AI")
-	float sightRadius = 1500.0f;
+	float sightRadius = 500.0f;
 
 	//How long an object is kept in memory after it is detected
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "AI")
@@ -35,7 +35,7 @@ public:
 
 	//AI loses right after being 50 units out of sightRadius
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "AI")
-	float loseSightRadius = sightRadius + 200.0f;
+	float loseSightRadius = sightRadius + 50.0f;
 
 	//FOV of the AI in degrees
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "AI")
@@ -45,4 +45,11 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "AI")
 	class UAISenseConfig_Sight* sightConfig;
 	
+	//distance of AI to player
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "AI")
+	float distanceToPlayer = 0.0f;
+
+	//Has AI detected player boolean?
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "AI")
+	bool bIsPlayerDetected = false;
 };

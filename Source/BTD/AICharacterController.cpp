@@ -4,6 +4,8 @@
 #include "AICharacterController.h"
 #include "Waypoint.h"
 #include "AICharacter.h"
+#include "BTDCharacter.h"
+#include "Kismet/GameplayStatics.h"
 #include "Perception/AIPerceptionComponent.h"
 #include "Perception/AISenseConfig_Sight.h"
 
@@ -57,9 +59,15 @@ void AAICharacterController::Tick(float deltaSeconds) {
 
 	AAICharacter* character = Cast<AAICharacter>(GetPawn());
 
+	if (distanceToPlayer > sightRadius) {
+		bIsPlayerDetected = false;
+	}
 	if (character->nextWaypoint != nullptr) {
 		MoveToActor(character->nextWaypoint, 5.0f);
-		
+	}
+	else if (bIsPlayerDetected == true) {
+		ABTDCharacter* player =  Cast<ABTDCharacter>(UGameplayStatics::GetPlayerCharacter(GetWorld(), 0));
+		MoveToActor(player, 5.0f);
 	}
 }
 
@@ -72,5 +80,11 @@ FRotator AAICharacterController::GetControlRotation() const {
 }
 
 void AAICharacterController::OnPawnDetected(const TArray<AActor*> &detectedPawns) {
-	
+	for (size_t i = 0; i < detectedPawns.Num(); i++) {
+		distanceToPlayer = GetPawn()->GetDistanceTo(detectedPawns[i]);
+
+		UE_LOG(LogTemp, Warning, TEXT("Distance: %f"), distanceToPlayer);
+	}
+
+	bIsPlayerDetected = true;
 }
