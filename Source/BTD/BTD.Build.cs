@@ -9,5 +9,7 @@ public class BTD : ModuleRules
 		PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
 
 		PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "OnlineSubsystem", "OnlineSubsystemUtils", "HeadMountedDisplay" });
+		
+		DynamicallyLoadedModuleNames.Add("OnlineSubsystemNull");
 	}
 }
