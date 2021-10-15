@@ -62,7 +62,7 @@ void AAICharacterController::Tick(float deltaSeconds) {
 	if (distanceToPlayer > sightRadius) {
 		bIsPlayerDetected = false;
 	}
-	if (character->nextWaypoint != nullptr) {
+	else if (character->nextWaypoint != nullptr) {
 		MoveToActor(character->nextWaypoint, 5.0f);
 	}
 	else if (bIsPlayerDetected == true) {
