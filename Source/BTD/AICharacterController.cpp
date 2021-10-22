@@ -5,6 +5,7 @@
 #include "Waypoint.h"
 #include "AICharacter.h"
 #include "BTDCharacter.h"
+#include "GameFramework/PawnMovementComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "Perception/AIPerceptionComponent.h"
 #include "Perception/AISenseConfig_Sight.h"
@@ -56,19 +57,27 @@ void AAICharacterController::OnPossess(APawn* inPawn) {
 
 void AAICharacterController::Tick(float deltaSeconds) {
 	Super::Tick(deltaSeconds);
+	
+	AAICharacter* aiCharacterRef = Cast<AAICharacter>(GetPawn());
+	ABTDCharacter* playerCharacter = Cast<ABTDCharacter>(GetWorld()->GetFirstPlayerController()->GetPawn());
 
-	AAICharacter* character = Cast<AAICharacter>(GetPawn());
+	if(IsValid(playerCharacter)) {
+		FVector newVelocity =  Seek(playerCharacter);
+		aiCharacterRef->SetActorLocation(aiCharacterRef->GetActorLocation() + newVelocity * deltaSeconds);
+	}
+	
+	
 
-	if (distanceToPlayer > sightRadius) {
-		bIsPlayerDetected = false;
-	}
-	else if (character->nextWaypoint != nullptr) {
-		MoveToActor(character->nextWaypoint, 5.0f);
-	}
-	else if (bIsPlayerDetected == true) {
-		ABTDCharacter* player =  Cast<ABTDCharacter>(UGameplayStatics::GetPlayerCharacter(GetWorld(), 0));
-		MoveToActor(player, 5.0f);
-	}
+	// if (distanceToPlayer > sightRadius) {
+	// 	bIsPlayerDetected = false;
+	// }
+	// else if (character->nextWaypoint != nullptr) {
+	// 	MoveToActor(character->nextWaypoint, 5.0f);
+	// }
+	// else if (bIsPlayerDetected == true) {
+	// 	ABTDCharacter* player =  Cast<ABTDCharacter>(UGameplayStatics::GetPlayerCharacter(GetWorld(), 0));
+	// 	MoveToActor(player, 5.0f);
+	// }
 }
 
 FRotator AAICharacterController::GetControlRotation() const {
@@ -77,6 +86,16 @@ FRotator AAICharacterController::GetControlRotation() const {
 	if (GetPawn() == nullptr) return FRotator(0.0f, 0.0f, 0.0f);
 	
 	return FRotator(0.0f, GetPawn()->GetActorRotation().Yaw, 0.0f);
+}
+
+FVector AAICharacterController::Seek(const ABTDCharacter* playerCharacter_) const {
+	AAICharacter* aiCharacterRef = Cast<AAICharacter>(GetPawn());
+	
+	FVector result = playerCharacter_->GetActorLocation() - aiCharacterRef->GetActorLocation();
+	result.Normalize();
+	result *= aiCharacterRef->GetMovementComponent()->GetMaxSpeed();
+
+	return result;
 }
 
 void AAICharacterController::OnPawnDetected(const TArray<AActor*> &detectedPawns) {

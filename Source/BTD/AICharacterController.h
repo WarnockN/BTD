@@ -4,6 +4,8 @@
 
 #include "CoreMinimal.h"
 #include "AIController.h"
+#include "BTDCharacter.h"
+
 #include "AICharacterController.generated.h"
 
 /**
@@ -21,6 +23,9 @@ public:
 	virtual void OnPossess(APawn* InPawn) override;
 	virtual void Tick(float deltaSeconds) override;
 	virtual FRotator GetControlRotation() const override;
+	
+	UFUNCTION()
+	FVector Seek(const ABTDCharacter* playerCharacter_) const;
 
 	UFUNCTION()
 	void OnPawnDetected(const TArray<AActor*> &detectedPawns);
