@@ -44,7 +44,7 @@ bool UGameInfoInstance::HostSession(TSharedPtr<const FUniqueNetId> userID, FName
 			//Set the delegate to the handle of the sessions interface
 			onCreateSessionCompleteDelegateHandle = sessions->AddOnCreateSessionCompleteDelegate_Handle(OnCreateSessionCompleteDelegate);
 			
-
+			
 			return sessions->CreateSession(*userID, sessionName_, *sessionSettings);
 		}
 	}
@@ -310,3 +310,14 @@ void UGameInfoInstance::DestroySessionAndLeaveGame() {
 		}
 	}
 }
+
+//converts error types to string
+/*void UGameInfoInstance::NetErrorToString(UPARAM(ref) ENetworkFailure netFail) {
+	ENetworkFailure::ToString(netFail);
+}
+
+void UGameInfoInstance::TravelErrorToString() {
+	ETravelFailure::ToString(ETravelFailure::Type());
+}*/
+
+
