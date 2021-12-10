@@ -12,7 +12,7 @@
 /**
  * 
  */
-UCLASS()
+UCLASS(Blueprintable)
 class BTD_API UChasePlayer : public UBTTask_BlackboardBase
 {
 	GENERATED_BODY()

@@ -49,3 +49,8 @@ void AAICharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
 
 }
 
+APatrolPath* AAICharacter::get_patrol_path()
+{
+	return patrol_path;
+}
+
