@@ -22,6 +22,7 @@ EBTNodeResult::Type UFindPlayerLocation::ExecuteTask(UBehaviorTreeComponent& own
 {
     // get player character and the NPC's controller
     ACharacter* const player = UGameplayStatics::GetPlayerCharacter(GetWorld(), 0);
+
     auto const cont = Cast<AAICharacterController>(owner_comp.GetAIOwner());
 
     // get player location to use as an origin

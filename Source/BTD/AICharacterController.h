@@ -22,7 +22,6 @@ public:
 	virtual void BeginPlay() override;
 	virtual void OnPossess(APawn* const pawn) override;
 	class UBlackboardComponent* get_blackboard() const;
-	virtual void on_target_detected(AActor* actor, FAIStimulus const stimulus);
 
 	virtual void Tick(float deltaSeconds) override;
 
@@ -36,6 +35,11 @@ private:
 	class UBlackboardComponent* blackboard;
 
 	class UAISenseConfig_Sight* sight_config;
+
+	class UAISenseConfig_Hearing* hearing_config;
+
+	UFUNCTION()
+	void on_target_detected(AActor* actor, FAIStimulus const stimulus);
 
 	UFUNCTION()
 	void on_updated(TArray<AActor*> const& updated_actors);

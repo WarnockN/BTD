@@ -11,6 +11,10 @@
 #include "GameFramework/PlayerController.h"
 #include "Perception/AIPerceptionStimuliSourceComponent.h"
 #include "Perception/AISense_Sight.h"
+#include "Perception/AISense_Hearing.h"
+#include "ai_tags.h"
+#include "Runtime/Engine/Classes/Kismet/GameplayStatics.h"
+#include "Runtime/Engine/Classes/Engine/Engine.h"
 
 //////////////////////////////////////////////////////////////////////////
 // ABTDCharacter
@@ -50,7 +54,6 @@ ABTDCharacter::ABTDCharacter()
 	// are set in the derived blueprint asset named MyCharacter (to avoid direct content references in C++)
 
 	setup_stimulus();
-
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -80,13 +83,32 @@ void ABTDCharacter::SetupPlayerInputComponent(class UInputComponent* PlayerInput
 
 	// VR headset functionality
 	PlayerInputComponent->BindAction("ResetVR", IE_Pressed, this, &ABTDCharacter::OnResetVR);
+
+	// something
+	PlayerInputComponent->BindAction("Distract", IE_Pressed, this, &ABTDCharacter::on_distract);
 }
+
+//void ABTDCharacter::Tick(float deltaSeconds)
+//{
+//	Super::Tick(deltaSeconds);
+//
+//}
 
 void ABTDCharacter::setup_stimulus()
 {
 	stimulus = CreateDefaultSubobject<UAIPerceptionStimuliSourceComponent>(TEXT("stimulus"));
 	stimulus->RegisterForSense(TSubclassOf<UAISense_Sight>());
 	stimulus->RegisterWithPerceptionSystem();
+}
+
+void ABTDCharacter::on_distract()
+{
+	if (distraction_sound)
+	{
+		FVector const loc = GetActorLocation();
+		UGameplayStatics::PlaySoundAtLocation(GetWorld(), distraction_sound, loc);
+		UAISense_Hearing::ReportNoiseEvent(GetWorld(), loc, 1.0f, this, 0.0f, tags::noise_tag);
+	}
 }
 
 
