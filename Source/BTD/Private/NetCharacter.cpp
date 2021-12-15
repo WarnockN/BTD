@@ -9,6 +9,7 @@
 #include "HealthComponent.h"
 #include "BTD/BTD.h"
 #include "Components/CapsuleComponent.h"
+#include "Net/UnrealNetwork.h"
 
 // Sets default values
 ANetCharacter::ANetCharacter()
@@ -42,20 +43,22 @@ void ANetCharacter::BeginPlay()
 	Super::BeginPlay();
 
 	DefaultFOV = CameraComp->FieldOfView;
-
-	//spawn default weapon
-	FActorSpawnParameters ActorSpawnParameters;
-	ActorSpawnParameters.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
-	
-	CurrWeapon = GetWorld()->SpawnActor<AWeapon>(StarterWeaponClass, FVector::ZeroVector, FRotator::ZeroRotator, ActorSpawnParameters);
-
-	if (CurrWeapon)
-	{
-		CurrWeapon->SetOwner(this);
-		CurrWeapon->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, WeaponSocketName);
-	}
-
 	HealthComp->OnHealthChanged.AddDynamic(this, &ANetCharacter::OnHealthChanged);
+
+	if (HasAuthority())
+	{
+		//spawn default weapon
+		FActorSpawnParameters ActorSpawnParameters;
+		ActorSpawnParameters.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+	
+		CurrWeapon = GetWorld()->SpawnActor<AWeapon>(StarterWeaponClass, FVector::ZeroVector, FRotator::ZeroRotator, ActorSpawnParameters);
+
+		if (CurrWeapon)
+		{
+			CurrWeapon->SetOwner(this);
+			CurrWeapon->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, WeaponSocketName);
+		}
+	}
 }
 
 
@@ -166,5 +169,12 @@ FVector ANetCharacter::GetPawnViewLocation() const
 	}
 
 	return Super::GetPawnViewLocation();
+}
+
+void ANetCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME(ANetCharacter, CurrWeapon);
 }
 

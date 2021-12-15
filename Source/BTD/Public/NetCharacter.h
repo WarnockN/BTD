@@ -56,6 +56,7 @@ protected:
 	//default FOV set in BeginPlay
 	float DefaultFOV;
 
+	UPROPERTY(Replicated)
 	AWeapon* CurrWeapon;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Player")
