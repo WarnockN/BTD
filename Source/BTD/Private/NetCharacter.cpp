@@ -5,6 +5,7 @@
 #include "Camera/CameraComponent.h"
 #include "GameFramework/PawnMovementComponent.h"
 #include "GameFramework/SpringArmComponent.h"
+#include "Weapon.h"
 
 // Sets default values
 ANetCharacter::ANetCharacter()
@@ -24,6 +25,8 @@ ANetCharacter::ANetCharacter()
 	ZoomFOV = 65.0f;
 	ZoomInterpSpeed = 20.0f;
 
+	WeaponSocketName = "WeaponSocket";
+
 }
 
 // Called when the game starts or when spawned
@@ -32,7 +35,21 @@ void ANetCharacter::BeginPlay()
 	Super::BeginPlay();
 
 	DefaultFOV = CameraComp->FieldOfView;
+
+	//spawn default weapon
+	FActorSpawnParameters ActorSpawnParameters;
+	ActorSpawnParameters.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+	
+	CurrWeapon = GetWorld()->SpawnActor<AWeapon>(StarterWeaponClass, FVector::ZeroVector, FRotator::ZeroRotator, ActorSpawnParameters);
+
+	if (CurrWeapon)
+	{
+		CurrWeapon->SetOwner(this);
+		CurrWeapon->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, WeaponSocketName);
+	}
 }
+
+
 
 
 // Called every frame
@@ -78,6 +95,14 @@ void ANetCharacter::EndZoom()
 	bWantsToZoom = false;	
 }
 
+void ANetCharacter::Fire()
+{
+	if (CurrWeapon)
+	{
+		CurrWeapon->Fire();
+	}
+}
+
 // Called to bind functionality to input
 void ANetCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
@@ -93,6 +118,8 @@ void ANetCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompon
 	PlayerInputComponent->BindAction("Jump", IE_Pressed, this,&ACharacter::Jump);
 	PlayerInputComponent->BindAction("Zoom", IE_Pressed, this, &ANetCharacter::BeginZoom);
 	PlayerInputComponent->BindAction("Zoom", IE_Released, this, &ANetCharacter::EndZoom);
+
+	PlayerInputComponent->BindAction("Fire", IE_Pressed, this, &ANetCharacter::Fire);
 }
 
 FVector ANetCharacter::GetPawnViewLocation() const

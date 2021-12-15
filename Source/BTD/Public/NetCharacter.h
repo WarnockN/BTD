@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 
+
 #include "Camera/CameraComponent.h"
 #include "GameFramework/Character.h"
 #include "GameFramework/SpringArmComponent.h"
@@ -12,6 +13,7 @@
 
 class UCameraComponent;
 class USpringArmComponent;
+class AWeapon;
 
 UCLASS()
 class BTD_API ANetCharacter : public ACharacter
@@ -51,6 +53,16 @@ protected:
 
 	//default FOV set in BeginPlay
 	float DefaultFOV;
+
+	AWeapon* CurrWeapon;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Player")
+	TSubclassOf<AWeapon> StarterWeaponClass;
+
+	UPROPERTY(VisibleDefaultsOnly, Category = "Player")
+	FName WeaponSocketName;
+
+	void Fire();
 
 public:	
 	// Called every frame
