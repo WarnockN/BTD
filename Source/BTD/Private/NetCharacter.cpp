@@ -3,6 +3,7 @@
 
 #include "NetCharacter.h"
 #include "Camera/CameraComponent.h"
+#include "GameFramework/PawnMovementComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 
 // Sets default values
@@ -14,6 +15,8 @@ ANetCharacter::ANetCharacter()
 	SpringArmComp = CreateDefaultSubobject<USpringArmComponent>(TEXT("SpringArmComp"));
 	SpringArmComp->bUsePawnControlRotation = true;
 	SpringArmComp->SetupAttachment(RootComponent);
+
+	GetMovementComponent()->GetNavAgentPropertiesRef().bCanCrouch = true;
 	
 	CameraComp = CreateDefaultSubobject<UCameraComponent>(TEXT("CameraComp"));
 	CameraComp->SetupAttachment(SpringArmComp);
@@ -45,6 +48,15 @@ void ANetCharacter::MoveRight(float Value)
 	AddMovementInput(GetActorRightVector() * Value);
 }
 
+void ANetCharacter::BeginCrouch()
+{
+	Crouch();
+}
+
+void ANetCharacter::EndCrouch()
+{
+	UnCrouch();
+}
 
 // Called to bind functionality to input
 void ANetCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -55,5 +67,9 @@ void ANetCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompon
 	PlayerInputComponent->BindAxis("MoveRight", this, &ANetCharacter::MoveRight);
 	PlayerInputComponent->BindAxis("LookUp", this, &ANetCharacter::AddControllerPitchInput);
 	PlayerInputComponent->BindAxis("Turn", this, &ANetCharacter::AddControllerYawInput);
+
+	PlayerInputComponent->BindAction("Crouch", IE_Pressed, this, &ANetCharacter::BeginCrouch);
+	PlayerInputComponent->BindAction("Crouch", IE_Released, this, &ANetCharacter::EndCrouch);
+	PlayerInputComponent->BindAction("Jump", IE_Pressed, this,&ACharacter::Jump);
 }
 
