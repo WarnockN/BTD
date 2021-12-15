@@ -21,13 +21,17 @@ ANetCharacter::ANetCharacter()
 	CameraComp = CreateDefaultSubobject<UCameraComponent>(TEXT("CameraComp"));
 	CameraComp->SetupAttachment(SpringArmComp);
 
+	ZoomFOV = 65.0f;
+	ZoomInterpSpeed = 20.0f;
+
 }
 
 // Called when the game starts or when spawned
 void ANetCharacter::BeginPlay()
 {
 	Super::BeginPlay();
-	
+
+	DefaultFOV = CameraComp->FieldOfView;
 }
 
 
@@ -35,6 +39,12 @@ void ANetCharacter::BeginPlay()
 void ANetCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+
+	float TargetFOV = bWantsToZoom ? ZoomFOV : DefaultFOV;
+
+	float NewFOV = FMath::FInterpTo(CameraComp->FieldOfView, TargetFOV, DeltaTime, ZoomInterpSpeed);
+	
+	CameraComp->SetFieldOfView(NewFOV);
 
 }
 
@@ -58,6 +68,16 @@ void ANetCharacter::EndCrouch()
 	UnCrouch();
 }
 
+void ANetCharacter::BeginZoom()
+{
+	bWantsToZoom = true;
+}
+
+void ANetCharacter::EndZoom()
+{
+	bWantsToZoom = false;	
+}
+
 // Called to bind functionality to input
 void ANetCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
@@ -71,6 +91,8 @@ void ANetCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompon
 	PlayerInputComponent->BindAction("Crouch", IE_Pressed, this, &ANetCharacter::BeginCrouch);
 	PlayerInputComponent->BindAction("Crouch", IE_Released, this, &ANetCharacter::EndCrouch);
 	PlayerInputComponent->BindAction("Jump", IE_Pressed, this,&ACharacter::Jump);
+	PlayerInputComponent->BindAction("Zoom", IE_Pressed, this, &ANetCharacter::BeginZoom);
+	PlayerInputComponent->BindAction("Zoom", IE_Released, this, &ANetCharacter::EndZoom);
 }
 
 FVector ANetCharacter::GetPawnViewLocation() const
