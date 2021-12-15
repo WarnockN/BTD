@@ -73,3 +73,14 @@ void ANetCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompon
 	PlayerInputComponent->BindAction("Jump", IE_Pressed, this,&ACharacter::Jump);
 }
 
+FVector ANetCharacter::GetPawnViewLocation() const
+{
+	if (CameraComp)
+	{
+		return CameraComp->GetComponentLocation();
+		
+	}
+
+	return Super::GetPawnViewLocation();
+}
+
