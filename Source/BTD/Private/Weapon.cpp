@@ -25,6 +25,17 @@ AWeapon::AWeapon()
 	MuzzleSocketName = "MuzzleSocket";
 	TracerTargetName = "Target";
 
+	BaseDamage = 20.0f;
+
+	RateOfFire = 600;
+}
+
+
+void AWeapon::BeginPlay()
+{
+	Super::BeginPlay();
+
+	TimeBetweenShots = 60 / RateOfFire;
 }
 
 void AWeapon::Fire()
@@ -67,11 +78,15 @@ void AWeapon::Fire()
 
 			AActor* HitActor = Hit.GetActor();
 
-			UGameplayStatics::ApplyPointDamage(HitActor, 20.0f, ShotDirection, Hit, MyOwner->GetInstigatorController(), this, DamageType);
-
-			
-
 			EPhysicalSurface SurfaceType = UPhysicalMaterial::DetermineSurfaceType(Hit.PhysMaterial.Get());
+
+			float ActualDamage = BaseDamage;
+			if (SurfaceType == SURFACE_FLESH_VULNERABLE)
+			{
+				ActualDamage *= 2.0f;
+			}
+
+			UGameplayStatics::ApplyPointDamage(HitActor, ActualDamage, ShotDirection, Hit, MyOwner->GetInstigatorController(), this, DamageType);
 
 			UParticleSystem* SelectedEffect = nullptr;
 
@@ -100,8 +115,25 @@ void AWeapon::Fire()
 		}
 		
 		PlayFireEffects(TracerEndPoint);
+
+		LastFireTime = GetWorld()->TimeSeconds;
 	}
 }
+
+void AWeapon::StartFire()
+{
+	float FirstDelay = FMath::Max(LastFireTime + TimeBetweenShots - GetWorld()->TimeSeconds, 0.0f);
+	
+	GetWorldTimerManager().SetTimer(FireTimer, this, &AWeapon::Fire, TimeBetweenShots, true, FirstDelay);
+	
+	Fire();
+}
+
+void AWeapon::EndFire()
+{
+	GetWorldTimerManager().ClearTimer(FireTimer);
+}
+
 
 void AWeapon::PlayFireEffects(FVector TraceEnd)
 {

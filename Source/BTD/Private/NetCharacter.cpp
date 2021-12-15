@@ -95,11 +95,19 @@ void ANetCharacter::EndZoom()
 	bWantsToZoom = false;	
 }
 
-void ANetCharacter::Fire()
+void ANetCharacter::StartFire()
 {
 	if (CurrWeapon)
 	{
-		CurrWeapon->Fire();
+		CurrWeapon->StartFire();
+	}
+}
+
+void ANetCharacter::EndFire()
+{
+	if (CurrWeapon)
+	{
+		CurrWeapon->EndFire();
 	}
 }
 
@@ -119,7 +127,8 @@ void ANetCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompon
 	PlayerInputComponent->BindAction("Zoom", IE_Pressed, this, &ANetCharacter::BeginZoom);
 	PlayerInputComponent->BindAction("Zoom", IE_Released, this, &ANetCharacter::EndZoom);
 
-	PlayerInputComponent->BindAction("Fire", IE_Pressed, this, &ANetCharacter::Fire);
+	PlayerInputComponent->BindAction("Fire", IE_Pressed, this, &ANetCharacter::StartFire);
+	PlayerInputComponent->BindAction("Fire", IE_Released, this, &ANetCharacter::EndFire);
 }
 
 FVector ANetCharacter::GetPawnViewLocation() const

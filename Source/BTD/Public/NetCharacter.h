@@ -62,7 +62,9 @@ protected:
 	UPROPERTY(VisibleDefaultsOnly, Category = "Player")
 	FName WeaponSocketName;
 
-	void Fire();
+	void StartFire();
+
+	void EndFire();
 
 public:	
 	// Called every frame
