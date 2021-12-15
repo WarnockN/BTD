@@ -6,6 +6,9 @@
 #include "GameFramework/PawnMovementComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "Weapon.h"
+#include "HealthComponent.h"
+#include "BTD/BTD.h"
+#include "Components/CapsuleComponent.h"
 
 // Sets default values
 ANetCharacter::ANetCharacter()
@@ -18,6 +21,10 @@ ANetCharacter::ANetCharacter()
 	SpringArmComp->SetupAttachment(RootComponent);
 
 	GetMovementComponent()->GetNavAgentPropertiesRef().bCanCrouch = true;
+
+	GetCapsuleComponent()->SetCollisionResponseToChannel(COLLISION_WEAPON, ECR_Ignore);
+
+	HealthComp = CreateDefaultSubobject<UHealthComponent>(TEXT("HealthComp"));
 	
 	CameraComp = CreateDefaultSubobject<UCameraComponent>(TEXT("CameraComp"));
 	CameraComp->SetupAttachment(SpringArmComp);
@@ -47,6 +54,8 @@ void ANetCharacter::BeginPlay()
 		CurrWeapon->SetOwner(this);
 		CurrWeapon->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, WeaponSocketName);
 	}
+
+	HealthComp->OnHealthChanged.AddDynamic(this, &ANetCharacter::OnHealthChanged);
 }
 
 
@@ -108,6 +117,19 @@ void ANetCharacter::EndFire()
 	if (CurrWeapon)
 	{
 		CurrWeapon->EndFire();
+	}
+}
+
+void ANetCharacter::OnHealthChanged(UHealthComponent* HealthComponent, float Health,
+								    float HealthDelta, const UDamageType* DamageType,
+						            AController* InstigatedBy, AActor* DamageCauser)
+{
+	if (Health <= 0.0f && !bDied)
+	{
+		//Die
+		bDied = true;
+		GetMovementComponent()->StopMovementImmediately();
+		GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	}
 }
 

@@ -29,11 +29,16 @@ void UHealthComponent::BeginPlay()
 void UHealthComponent::HandleTakeAnyDamage(AActor* DamagedActor, float Damage, const class UDamageType* DamageType,
 										   class AController* InstigatedBy, AActor* DamageCuaser)
 {
-	if (Damage <= 0.0f) return;
+	if (Damage <= 0.0f)
+	{
+		return;
+	}
 
 	//update health clamped 
 	Health = FMath::Clamp(Health - Damage, 0.0f, DefaultHealth);
 
 	UE_LOG(LogTemp, Log, TEXT("Health changed: %s"), *FString::SanitizeFloat(Health));
+
+	OnHealthChanged.Broadcast(this, Health, Damage, DamageType, InstigatedBy, DamageCuaser);
 }
 

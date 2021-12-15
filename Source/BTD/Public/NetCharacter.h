@@ -3,8 +3,6 @@
 #pragma once
 
 #include "CoreMinimal.h"
-
-
 #include "Camera/CameraComponent.h"
 #include "GameFramework/Character.h"
 #include "GameFramework/SpringArmComponent.h"
@@ -14,6 +12,7 @@
 class UCameraComponent;
 class USpringArmComponent;
 class AWeapon;
+class UHealthComponent;
 
 UCLASS()
 class BTD_API ANetCharacter : public ACharacter
@@ -43,6 +42,9 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Component")
 	USpringArmComponent* SpringArmComp;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Component")
+	UHealthComponent* HealthComp;
+
 	bool bWantsToZoom;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Player")
@@ -65,6 +67,15 @@ protected:
 	void StartFire();
 
 	void EndFire();
+
+	UFUNCTION()
+	void OnHealthChanged(UHealthComponent* HealthComponent, float Health,
+						float HealthDelta, const UDamageType* DamageType,
+						AController* InstigatedBy, AActor* DamageCauser);
+
+	//pawn died prev?
+	UPROPERTY(BlueprintReadOnly, Category = "Player")
+	bool bDied;
 
 public:	
 	// Called every frame
