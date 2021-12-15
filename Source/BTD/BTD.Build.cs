@@ -18,7 +18,7 @@ public class BTD : ModuleRules
 			"HeadMountedDisplay", 
 			"AIModule",
 			"GameplayTasks",
-			"NavigationSystem"});
+			"NavigationSystem", "PhysicsCore"});
 		
 		DynamicallyLoadedModuleNames.Add("OnlineSubsystemNull");
 	}
