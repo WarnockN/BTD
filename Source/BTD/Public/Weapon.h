@@ -10,6 +10,17 @@ class USkeletalMeshComponent;
 class UDamageType;
 class UParticleSystem;
 
+USTRUCT()
+struct FHitscanTrace
+{
+	GENERATED_BODY()
+	
+	UPROPERTY()
+	FVector_NetQuantize TraceFrom;
+	UPROPERTY()
+	FVector_NetQuantize TraceEnd;
+};
+
 UCLASS()
 class BTD_API AWeapon : public AActor
 {
@@ -26,6 +37,9 @@ public:
 
 protected:
 	virtual void BeginPlay() override;
+
+	UFUNCTION(Server, Reliable, WithValidation)
+	void ServerFire();
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Component"); 
 	USkeletalMeshComponent* MeshComp;
