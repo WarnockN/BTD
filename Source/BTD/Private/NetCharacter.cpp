@@ -130,6 +130,10 @@ void ANetCharacter::OnHealthChanged(UHealthComponent* HealthComponent, float Hea
 		bDied = true;
 		GetMovementComponent()->StopMovementImmediately();
 		GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+
+		DetachFromControllerPendingDestroy();
+
+		SetLifeSpan(10.0f);
 	}
 }
 
