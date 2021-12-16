@@ -5,10 +5,12 @@
 #include "CoreMinimal.h"
 
 
+
 #include "GameFramework/Pawn.h"
 #include "TrackerBot.generated.h"
 
 class UHealthComponent;
+class USphereComponent;
 
 UCLASS()
 class BTD_API ATrackerBot : public APawn
@@ -29,14 +31,8 @@ protected:
 	UPROPERTY(VisibleDefaultsOnly, Category = "Components")
 	UHealthComponent* HealthComp;
 
-	UFUNCTION()
-	void HandleTakeDamage(UHealthComponent* OwningHealthComp, float Health,
-									float HealthDelta, const UDamageType* DamageType,
-									AController* InstigatedBy, AActor* DamageCauser);
-
-	FVector GetNextPathPoint();
-
-	FVector NextPathPoint;
+	UPROPERTY(VisibleDefaultsOnly, Category = "Components")
+	USphereComponent* SphereComp;
 
 	UPROPERTY(EditDefaultsOnly, Category = "TrackerBot")
 	float MovementForce;
@@ -50,7 +46,38 @@ protected:
 	//dynamic mat to pulse on dmg
 	UMaterialInstanceDynamic* MatInst;
 
+	
+	UPROPERTY(EditDefaultsOnly, Category = "TrackerBot")
+	UParticleSystem* ExplosionEffect;
+
+	bool bExploded;
+
+	UPROPERTY(EditDefaultsOnly, Category = "TrackerBot")
+	float ExplosionRadius;
+
+	UPROPERTY(EditDefaultsOnly, Category = "TrackerBot")
+	float ExplosionDamage;
+
+	FTimerHandle ExplosionTimerHandle;
+
+	bool bStartedSelfDestruct;
+
+	UFUNCTION()
+	void HandleTakeDamage(UHealthComponent* OwningHealthComp, float Health,
+									float HealthDelta, const UDamageType* DamageType,
+									AController* InstigatedBy, AActor* DamageCauser);
+
+	FVector GetNextPathPoint();
+
+	FVector NextPathPoint;
+
+	void SelfDestruct();
+
+	void DamageSelf();
+	
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
+
+	virtual void NotifyActorBeginOverlap(AActor* OtherActor) override;
 };
