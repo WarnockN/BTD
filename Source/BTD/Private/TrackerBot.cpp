@@ -13,6 +13,13 @@
 #include "GameFramework/Character.h"
 #include "Components/SphereComponent.h"
 
+static int32 DebugTrackerBotDrawing = 0;
+FAutoConsoleVariableRef CVARDebugTrackerBotDrawing(
+	TEXT("COOP.DebugTrackerBot"),
+	DebugTrackerBotDrawing,
+	TEXT("Draw Debug Lines for TrackerBot"),
+	ECVF_Cheat);
+
 // Sets default values
 ATrackerBot::ATrackerBot()
 {
@@ -36,11 +43,10 @@ ATrackerBot::ATrackerBot()
 	
 	bUseVelocityChange = false;
 	MovementForce = 1000;
-
 	RequiredDistanceToTarget = 100;
 
-	ExplosionRadius = 100.0f;
-	ExplosionDamage = 40.0f;
+	ExplosionRadius = 350.0f;
+	ExplosionDamage = 60.0f;
 }
 
 // Called when the game starts or when spawned
@@ -90,7 +96,7 @@ FVector ATrackerBot::GetNextPathPoint()
 
 	//return next pointin path
 	UNavigationPath* NavPath = UNavigationSystemV1::FindPathToActorSynchronously(this, GetActorLocation(), NetCharacter);
-	if (NavPath->PathPoints.Num() > 1)
+	if (NavPath && NavPath->PathPoints.Num() > 1)
 	{
 		return NavPath->PathPoints[1];
 	}
@@ -156,14 +162,25 @@ void ATrackerBot::Tick(float DeltaTime)
 			ForceDir *= MovementForce;
 		
 			MeshComp->AddForce(ForceDir, NAME_None, bUseVelocityChange);
-			DrawDebugDirectionalArrow(GetWorld(), GetActorLocation(), GetActorLocation() + ForceDir, 32, FColor::Yellow, false, 0.0f, 1.0f);
+
+			if (DebugTrackerBotDrawing)
+			{
+				DrawDebugDirectionalArrow(GetWorld(), GetActorLocation(), GetActorLocation() + ForceDir, 32, FColor::Yellow, false, 0.0f, 1.0f);
+			}
+			
 		}
-		DrawDebugSphere(GetWorld(), NextPathPoint, 20, 12, FColor::Yellow, false, 0.0f, 1.0f);
+		if (DebugTrackerBotDrawing)
+		{
+			DrawDebugSphere(GetWorld(), NextPathPoint, 20, 12, FColor::Yellow, false, 0.0f, 1.0f);
+		}
+		
 	}
 }
 
 void ATrackerBot::NotifyActorBeginOverlap(AActor* OtherActor)
 {
+	Super::NotifyActorBeginOverlap(OtherActor);
+	
 	if (!bStartedSelfDestruct && !bExploded)
 	{
 		ANetCharacter* NetCharacter = Cast<ANetCharacter>(OtherActor);
