@@ -10,13 +10,14 @@ class USkeletalMeshComponent;
 class UDamageType;
 class UParticleSystem;
 
+//contains information of a single hitscan line trace 
 USTRUCT()
 struct FHitscanTrace
 {
 	GENERATED_BODY()
 	
 	UPROPERTY()
-	FVector_NetQuantize TraceFrom;
+	TEnumAsByte<EPhysicalSurface> SurfaceType;
 	UPROPERTY()
 	FVector_NetQuantize TraceEnd;
 };
@@ -72,6 +73,12 @@ protected:
 
 	float LastFireTime;
 
+	UPROPERTY(ReplicatedUsing=OnRep_HitscanTrace)
+	FHitscanTrace HitscanTrace;
+
+	UFUNCTION()
+	void OnRep_HitscanTrace();
+
 	//RPM
 	UPROPERTY(EditDefaultsOnly, Category = "Weapon")
 	float RateOfFire;
@@ -80,6 +87,8 @@ protected:
 	float TimeBetweenShots;
 
 	void PlayFireEffects(FVector TraceEnd);
+
+	void PlayImpactEffects(EPhysicalSurface SurfaceType, FVector ImpactPoint);
 
 	void Fire();
 };
