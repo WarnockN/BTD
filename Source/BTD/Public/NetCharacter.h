@@ -70,12 +70,12 @@ protected:
 	void EndFire();
 
 	UFUNCTION()
-	void OnHealthChanged(UHealthComponent* HealthComponent, float Health,
+	void OnHealthChanged(UHealthComponent* OwningHealthComp, float Health,
 						float HealthDelta, const UDamageType* DamageType,
 						AController* InstigatedBy, AActor* DamageCauser);
 
 	//pawn died prev?
-	UPROPERTY(BlueprintReadOnly, Category = "Player")
+	UPROPERTY(Replicated, BlueprintReadOnly, Category = "Player")
 	bool bDied;
 
 public:	

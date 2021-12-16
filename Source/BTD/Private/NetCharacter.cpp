@@ -123,7 +123,7 @@ void ANetCharacter::EndFire()
 	}
 }
 
-void ANetCharacter::OnHealthChanged(UHealthComponent* HealthComponent, float Health,
+void ANetCharacter::OnHealthChanged(UHealthComponent* OwningHealthComp, float Health,
 								    float HealthDelta, const UDamageType* DamageType,
 						            AController* InstigatedBy, AActor* DamageCauser)
 {
@@ -176,5 +176,6 @@ void ANetCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLif
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
 	DOREPLIFETIME(ANetCharacter, CurrWeapon);
+	DOREPLIFETIME(ANetCharacter, bDied);
 }
 
