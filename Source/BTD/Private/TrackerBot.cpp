@@ -110,15 +110,21 @@ void ATrackerBot::SelfDestruct()
 	
 	UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), ExplosionEffect, GetActorLocation());
 
-	TArray<AActor*> IgnoredActors;
-	IgnoredActors.Add(this);
+	MeshComp->SetVisibility(false, true);
+	MeshComp->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	
-	UGameplayStatics::ApplyRadialDamage(this, ExplosionDamage, GetActorLocation(), ExplosionRadius, nullptr, IgnoredActors, this, GetInstigatorController(), true);
 
-	DrawDebugSphere(GetWorld(), GetActorLocation(), ExplosionRadius, 12, FColor::Red, false, 2.0f, 0, 1.0f);
+	if (HasAuthority())
+	{
+		TArray<AActor*> IgnoredActors;
+		IgnoredActors.Add(this);
 	
-	//Delete Actor immediately
-	Destroy();
+		UGameplayStatics::ApplyRadialDamage(this, ExplosionDamage, GetActorLocation(), ExplosionRadius, nullptr, IgnoredActors, this, GetInstigatorController(), true);
+
+		DrawDebugSphere(GetWorld(), GetActorLocation(), ExplosionRadius, 12, FColor::Red, false, 2.0f, 0, 1.0f);
+
+		SetLifeSpan(2.0f);
+	}
 }
 
 void ATrackerBot::DamageSelf()
@@ -130,7 +136,7 @@ void ATrackerBot::DamageSelf()
 void ATrackerBot::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-	if (HasAuthority())
+	if (HasAuthority() && !bExploded)
 	{
 		float DistanceToTarget = (GetActorLocation() - NextPathPoint).Size();
 	
@@ -158,7 +164,7 @@ void ATrackerBot::Tick(float DeltaTime)
 
 void ATrackerBot::NotifyActorBeginOverlap(AActor* OtherActor)
 {
-	if (!bStartedSelfDestruct)
+	if (!bStartedSelfDestruct && !bExploded)
 	{
 		ANetCharacter* NetCharacter = Cast<ANetCharacter>(OtherActor);
 
@@ -166,8 +172,12 @@ void ATrackerBot::NotifyActorBeginOverlap(AActor* OtherActor)
 		{
 			// overlapped with a player
 
-			//start self destruct
-			GetWorldTimerManager().SetTimer(ExplosionTimerHandle, this, &ATrackerBot::DamageSelf, 0.5f, true, 0.0f);
+			if (HasAuthority())
+			{
+				//start self destruct
+				GetWorldTimerManager().SetTimer(ExplosionTimerHandle, this, &ATrackerBot::DamageSelf, 0.5f, true, 0.0f);
+			}
+			
 			bStartedSelfDestruct = true;
 		}
 	}
