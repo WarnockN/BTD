@@ -62,6 +62,8 @@ protected:
 
 	bool bStartedSelfDestruct;
 
+	FVector NextPathPoint;
+
 	UFUNCTION()
 	void HandleTakeDamage(UHealthComponent* OwningHealthComp, float Health,
 									float HealthDelta, const UDamageType* DamageType,
@@ -69,7 +71,7 @@ protected:
 
 	FVector GetNextPathPoint();
 
-	FVector NextPathPoint;
+	
 
 	void SelfDestruct();
 

@@ -48,8 +48,10 @@ void ATrackerBot::BeginPlay()
 {
 	Super::BeginPlay();
 
-	FVector NextPoint = GetNextPathPoint();
-
+	if (HasAuthority())
+	{
+		NextPathPoint = GetNextPathPoint();
+	}
 	
 }
 
@@ -128,28 +130,30 @@ void ATrackerBot::DamageSelf()
 void ATrackerBot::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
-	float DistanceToTarget = (GetActorLocation() - NextPathPoint).Size();
+	if (HasAuthority())
+	{
+		float DistanceToTarget = (GetActorLocation() - NextPathPoint).Size();
 	
-	if (DistanceToTarget <= RequiredDistanceToTarget)
-	{
-		NextPathPoint = GetNextPathPoint();
+		if (DistanceToTarget <= RequiredDistanceToTarget)
+		{
+			NextPathPoint = GetNextPathPoint();
 
-		DrawDebugString(GetWorld(), GetActorLocation(), "Target reached!");
+			DrawDebugString(GetWorld(), GetActorLocation(), "Target reached!");
 		
-	}
-	else
-	{
-		//keep moving towards next target
-		FVector ForceDir = NextPathPoint - GetActorLocation();
-		ForceDir.Normalize();
+		}
+		else
+		{
+			//keep moving towards next target
+			FVector ForceDir = NextPathPoint - GetActorLocation();
+			ForceDir.Normalize();
 
-		ForceDir *= MovementForce;
+			ForceDir *= MovementForce;
 		
-		MeshComp->AddForce(ForceDir, NAME_None, bUseVelocityChange);
-		DrawDebugDirectionalArrow(GetWorld(), GetActorLocation(), GetActorLocation() + ForceDir, 32, FColor::Yellow, false, 0.0f, 1.0f);
+			MeshComp->AddForce(ForceDir, NAME_None, bUseVelocityChange);
+			DrawDebugDirectionalArrow(GetWorld(), GetActorLocation(), GetActorLocation() + ForceDir, 32, FColor::Yellow, false, 0.0f, 1.0f);
+		}
+		DrawDebugSphere(GetWorld(), NextPathPoint, 20, 12, FColor::Yellow, false, 0.0f, 1.0f);
 	}
-	DrawDebugSphere(GetWorld(), NextPathPoint, 20, 12, FColor::Yellow, false, 0.0f, 1.0f);
 }
 
 void ATrackerBot::NotifyActorBeginOverlap(AActor* OtherActor)
