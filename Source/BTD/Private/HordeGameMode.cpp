@@ -77,6 +77,8 @@ void AHordeGameMode::PrepareForNextWave()
 	GetWorldTimerManager().SetTimer(NextWaveTimerHandle, this , &AHordeGameMode::StartWave, TimeBetweenWaves,false);
 
 	SetWaveState(EWaveState::WaitingToStart);
+
+	RestartDeadPlayers();
 }
 
 void AHordeGameMode::CheckWaveState()
@@ -134,6 +136,18 @@ void AHordeGameMode::CheckAnyPlayerAlive()
 			}
 			//no player alive
 			GameOver();
+		}
+	}
+}
+
+void AHordeGameMode::RestartDeadPlayers()
+{
+	for (FConstPlayerControllerIterator It = GetWorld()->GetPlayerControllerIterator(); It; ++It)
+	{
+		APlayerController* PC = It->Get();
+		if (PC && PC->GetPawn() == nullptr)
+		{
+			RestartPlayer(PC);
 		}
 	}
 }

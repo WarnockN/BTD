@@ -41,6 +41,8 @@ protected:
 
 	void CheckAnyPlayerAlive();
 
+	void RestartDeadPlayers();
+
 	void SetWaveState(EWaveState WaveState);
 	
 	FTimerHandle BotSpawnTimerHandle;
