@@ -3,8 +3,12 @@
 #pragma once
 
 #include "CoreMinimal.h"
+
+
 #include "GameFramework/Pawn.h"
 #include "TrackerBot.generated.h"
+
+class UHealthComponent;
 
 UCLASS()
 class BTD_API ATrackerBot : public APawn
@@ -21,6 +25,30 @@ protected:
 	
 	UPROPERTY(VisibleDefaultsOnly, Category = "Components")
 	UStaticMeshComponent* MeshComp;
+
+	UPROPERTY(VisibleDefaultsOnly, Category = "Components")
+	UHealthComponent* HealthComp;
+
+	UFUNCTION()
+	void HandleTakeDamage(UHealthComponent* OwningHealthComp, float Health,
+									float HealthDelta, const UDamageType* DamageType,
+									AController* InstigatedBy, AActor* DamageCauser);
+
+	FVector GetNextPathPoint();
+
+	FVector NextPathPoint;
+
+	UPROPERTY(EditDefaultsOnly, Category = "TrackerBot")
+	float MovementForce;
+
+	UPROPERTY(EditDefaultsOnly, Category = "TrackerBot")
+	bool bUseVelocityChange;
+
+	UPROPERTY(EditDefaultsOnly, Category = "TrackerBot")
+	float RequiredDistanceToTarget;
+
+	//dynamic mat to pulse on dmg
+	UMaterialInstanceDynamic* MatInst;
 
 public:	
 	// Called every frame
