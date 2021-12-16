@@ -28,9 +28,9 @@ void AHordeGameMode::StartPlay()
 void AHordeGameMode::Tick(float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
-
 	CheckWaveState();
 	CheckAnyPlayerAlive();
+
 }
 
 void AHordeGameMode::StartWave()
