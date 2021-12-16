@@ -3,12 +3,17 @@
 #pragma once
 
 #include "CoreMinimal.h"
+
+#include "HordeGameState.h"
 #include "GameFramework/GameModeBase.h"
 #include "HordeGameMode.generated.h"
 
 /**
  * 
  */
+
+enum class EWaveState : uint8;
+
 UCLASS()
 class BTD_API AHordeGameMode : public AGameModeBase
 {
@@ -27,10 +32,16 @@ protected:
 	//stop spawn bots
 	void EndWave();
 
+	void GameOver();
+
 	//set timer for next wave
 	void PrepareForNextWave();
 
 	void CheckWaveState();
+
+	void CheckAnyPlayerAlive();
+
+	void SetWaveState(EWaveState WaveState);
 	
 	FTimerHandle BotSpawnTimerHandle;
 	FTimerHandle NextWaveTimerHandle;
