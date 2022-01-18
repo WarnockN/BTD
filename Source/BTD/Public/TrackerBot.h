@@ -3,14 +3,12 @@
 #pragma once
 
 #include "CoreMinimal.h"
-
-
-
 #include "GameFramework/Pawn.h"
 #include "TrackerBot.generated.h"
 
 class UHealthComponent;
 class USphereComponent;
+class USoundCue;
 
 UCLASS()
 class BTD_API ATrackerBot : public APawn
@@ -58,6 +56,9 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = "TrackerBot")
 	float ExplosionDamage;
 
+	UPROPERTY(EditDefaultsOnly, Category = "TrackerBot")
+	float SelfDamageInterval;
+
 	FTimerHandle ExplosionTimerHandle;
 
 	bool bStartedSelfDestruct;
@@ -76,6 +77,12 @@ protected:
 	void SelfDestruct();
 
 	void DamageSelf();
+
+	UPROPERTY(EditDefaultsOnly, Category = "TrackerBot")
+	USoundCue* SelfDestructSound;
+
+	UPROPERTY(EditDefaultsOnly, Category = "TrackerBot")
+	USoundCue* ExplodeSound;
 	
 public:	
 	// Called every frame

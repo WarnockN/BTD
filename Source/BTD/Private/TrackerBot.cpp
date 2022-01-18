@@ -12,6 +12,7 @@
 #include "NetCharacter.h"
 #include "GameFramework/Character.h"
 #include "Components/SphereComponent.h"
+#include "Sound/SoundCue.h"
 
 static int32 DebugTrackerBotDrawing = 0;
 FAutoConsoleVariableRef CVARDebugTrackerBotDrawing(
@@ -47,6 +48,8 @@ ATrackerBot::ATrackerBot()
 
 	ExplosionRadius = 350.0f;
 	ExplosionDamage = 60.0f;
+
+	SelfDamageInterval = 0.25f;
 }
 
 // Called when the game starts or when spawned
@@ -129,6 +132,8 @@ void ATrackerBot::SelfDestruct()
 
 		DrawDebugSphere(GetWorld(), GetActorLocation(), ExplosionRadius, 12, FColor::Red, false, 2.0f, 0, 1.0f);
 
+		UGameplayStatics::PlaySoundAtLocation(this, ExplodeSound, GetActorLocation());
+		
 		SetLifeSpan(2.0f);
 	}
 }
@@ -192,10 +197,12 @@ void ATrackerBot::NotifyActorBeginOverlap(AActor* OtherActor)
 			if (HasAuthority())
 			{
 				//start self destruct
-				GetWorldTimerManager().SetTimer(ExplosionTimerHandle, this, &ATrackerBot::DamageSelf, 0.5f, true, 0.0f);
-			}
+				GetWorldTimerManager().SetTimer(ExplosionTimerHandle, this, &ATrackerBot::DamageSelf, SelfDamageInterval, true, 0.0f);
+			}	
 			
 			bStartedSelfDestruct = true;
+
+			UGameplayStatics::SpawnSoundAttached(SelfDestructSound, RootComponent);
 		}
 	}
 	
