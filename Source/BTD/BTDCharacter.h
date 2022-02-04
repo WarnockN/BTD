@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
+#include "Sound/SoundBase.h"
 #include "BTDCharacter.generated.h"
 
 UCLASS(config=Game)
@@ -68,5 +69,17 @@ public:
 	FORCEINLINE class USpringArmComponent* GetCameraBoom() const { return CameraBoom; }
 	/** Returns FollowCamera subobject **/
 	FORCEINLINE class UCameraComponent* GetFollowCamera() const { return FollowCamera; }
+
+	// virtual void Tick(float deltaSeconds) override;
+
+private:
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Sound", meta = (AllowPrivateAccess = "true"))
+	USoundBase* distraction_sound;
+
+	class UAIPerceptionStimuliSourceComponent* stimulus;
+	void setup_stimulus();
+
+	void on_distract();
 };
 

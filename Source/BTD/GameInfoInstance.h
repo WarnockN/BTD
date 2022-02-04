@@ -20,6 +20,9 @@ class BTD_API UGameInfoInstance : public UGameInstance
 {
 	GENERATED_BODY()
 
+	/*UPROPERTY(BlueprintReadWrite, Category = "Network")
+	ENetworkFailure netFail = ENetworkFailure::Type();*/
+
 	/*Delegate called when session created*/
 	FOnCreateSessionCompleteDelegate OnCreateSessionCompleteDelegate;
 
@@ -115,4 +118,10 @@ class BTD_API UGameInfoInstance : public UGameInstance
 	
 	UFUNCTION(BlueprintCallable, Category = "Network")
 	void DestroySessionAndLeaveGame();
+
+	/*UFUNCTION(BlueprintCallable, Category = "Network")
+	void NetErrorToString(UPARAM(ref) netFail);
+
+	UFUNCTION(BlueprintCallable, Category = "Network")
+	void TravelErrorToString();*/
 };

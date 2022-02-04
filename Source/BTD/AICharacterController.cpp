@@ -2,75 +2,143 @@
 
 
 #include "AICharacterController.h"
-#include "Waypoint.h"
 #include "AICharacter.h"
-#include "Perception/AIPerceptionComponent.h"
+#include "BTDCharacter.h"
+#include "BehaviorTree/BehaviorTreeComponent.h"
+#include "BehaviorTree/BehaviorTree.h"
+#include "BehaviorTree/BlackboardComponent.h"
+#include "UObject/ConstructorHelpers.h"
 #include "Perception/AISenseConfig_Sight.h"
+#include "Perception/AISenseConfig_Hearing.h"
+#include "Perception/AIPerceptionStimuliSourceComponent.h"
+#include "Perception/AIPerceptionComponent.h"
+#include "blackboard_keys.h"
+#include "Runtime/Engine/Classes/Kismet/GameplayStatics.h"
+#include "Runtime/Engine/Classes/Engine/World.h"
+#include "Runtime/Engine/Classes/Engine/Engine.h"
+#include "GameFramework/Character.h"
+#include "ai_tags.h"
 
 
-AAICharacterController::AAICharacterController() {
-	//Allow AI actor to Tick()
-	PrimaryActorTick.bCanEverTick = true;
-
-	//Setup sight config and Perception component
-	sightConfig = CreateDefaultSubobject<UAISenseConfig_Sight>(TEXT("Sight Config"));
-	SetPerceptionComponent(*CreateDefaultSubobject<UAIPerceptionComponent>(TEXT("Perception Component")));
-
-	//Set the AI sight settings
+AAICharacterController::AAICharacterController(FObjectInitializer const& object_initializer)
+{
+	static ConstructorHelpers::FObjectFinder<UBehaviorTree> obj(TEXT("BehaviorTree'/Game/Blueprints/Charcters/BT_AI.BT_AI'"));
+	if (obj.Succeeded())
 	{
-		sightConfig->SightRadius = sightRadius;
-		sightConfig->LoseSightRadius = loseSightRadius;
-		sightConfig->PeripheralVisionAngleDegrees = fov;
-		sightConfig->SetMaxAge(sightAge);
-
-		//Detect enemies, allies, and neutrals
-		sightConfig->DetectionByAffiliation.bDetectEnemies = true;
-		sightConfig->DetectionByAffiliation.bDetectFriendlies = true;
-		sightConfig->DetectionByAffiliation.bDetectNeutrals = true;
+		btree = obj.Object;
 	}
 
-	//Set the AI's dominant sense to sight, our AI will never hear the player or use any other senses, only works on visuals
-	GetPerceptionComponent()->SetDominantSense(*sightConfig->GetSenseImplementation());
+	behavior_tree_component = object_initializer.CreateDefaultSubobject<UBehaviorTreeComponent>(this, TEXT("BehaviorComp"));
+	blackboard = object_initializer.CreateDefaultSubobject<UBlackboardComponent>(this, TEXT("BlackboardComp"));
+	setup_perception_system();
 
-	//Create delegate to call when something is detected by the AI
-	GetPerceptionComponent()->OnPerceptionUpdated.AddDynamic(this, &AAICharacterController::OnPawnDetected);
-
-	//Save all the settings for the sight configuration.
-	GetPerceptionComponent()->ConfigureSense(*sightConfig);
-
-	
 }
 
-void AAICharacterController::BeginPlay() {
+void AAICharacterController::BeginPlay()
+{
 	Super::BeginPlay();
-
-	if (GetPerceptionComponent() != nullptr) GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Green, TEXT("All systems set up!"));
-	else GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Green, TEXT("A problem has aoccured."));
+	RunBehaviorTree(btree);
+	behavior_tree_component->StartTree(*btree);
 }
 
-void AAICharacterController::OnPossess(APawn* inPawn) {
-	Super::OnPossess(inPawn);
+void AAICharacterController::OnPossess(APawn* const pawn)
+{
+	Super::OnPossess(pawn);
+	if (blackboard)
+	{
+		blackboard->InitializeBlackboard(*btree->BlackboardAsset);
+	}
+
 }
 
-void AAICharacterController::Tick(float deltaSeconds) {
-	Super::Tick(deltaSeconds);
+UBlackboardComponent* AAICharacterController::get_blackboard() const
+{
+	return blackboard;
+}
 
-	AAICharacter* character = Cast<AAICharacter>(GetPawn());
-
-	if (character->nextWaypoint != nullptr) {
-		MoveToActor(character->nextWaypoint, 5.0f);
-		
+//Might have to check if i did this right - ABTDCharacter or AAICharacter
+void AAICharacterController::on_target_detected(AActor* actor, FAIStimulus const stimulus)
+{
+	if (auto const ch = Cast<ABTDCharacter>(actor))
+	{
+		get_blackboard()->SetValueAsBool(bb_keys::can_see_player, stimulus.WasSuccessfullySensed());
 	}
 }
 
-FRotator AAICharacterController::GetControlRotation() const {
-	/*If no pawn exists, set rotation to 0
-	  Otherwise, set rotation to the ai characters yaw. This makes them face the direction they are walking*/
-	if (GetPawn() == nullptr) return FRotator(0.0f, 0.0f, 0.0f);
-	
-	return FRotator(0.0f, GetPawn()->GetActorRotation().Yaw, 0.0f);
+void AAICharacterController::Tick(float deltaSeconds)
+{
 }
 
-void AAICharacterController::OnPawnDetected(const TArray<AActor*> &detectedPawns) {
+void AAICharacterController::on_updated(TArray<AActor*> const& updated_actors)
+{
+	for (size_t x = 0; x < updated_actors.Num(); ++x)
+	{
+		FActorPerceptionBlueprintInfo info;
+
+		// gets actors perception and puts it in info
+		GetPerceptionComponent()->GetActorsPerception(updated_actors[x], info);
+
+		for (size_t k = 0; k < info.LastSensedStimuli.Num(); ++k)
+		{
+			GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Green, TEXT("AI Controller - FLOOP1 Worked"));
+
+			FAIStimulus const stim = info.LastSensedStimuli[k];
+			if (stim.Tag == tags::noise_tag)
+			{
+				get_blackboard()->SetValueAsBool(bb_keys::is_investigating, stim.WasSuccessfullySensed());
+				get_blackboard()->SetValueAsVector(bb_keys::target_location, stim.StimulusLocation);
+			}
+			
+			GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Green, TEXT("AI Controller - FLOOP2 Worked"));
+		}
+	}
+
+	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Green, TEXT("AI Controller Updated"));
+}
+
+void AAICharacterController::setup_perception_system()
+{
+	//create and initialise sight configuration object
+	sight_config = CreateDefaultSubobject<UAISenseConfig_Sight>(TEXT("Sight Config"));
+
+	if (sight_config)
+	{
+		SetPerceptionComponent(*CreateDefaultSubobject<UAIPerceptionComponent>(TEXT("Perception Component")));
+		sight_config->SightRadius = 500.0f;
+		sight_config->LoseSightRadius = sight_config->SightRadius + 25.0f;
+		sight_config->PeripheralVisionAngleDegrees = 90.0f;
+		sight_config->SetMaxAge(5.0f);
+		sight_config->AutoSuccessRangeFromLastSeenLocation = 520.0f;
+		sight_config->DetectionByAffiliation.bDetectEnemies =
+			sight_config->DetectionByAffiliation.bDetectFriendlies =
+			sight_config->DetectionByAffiliation.bDetectNeutrals = true;
+
+		// add sight configuration component to perception component
+		GetPerceptionComponent()->SetDominantSense(*sight_config->GetSenseImplementation());
+
+		//test
+		GetPerceptionComponent()->OnTargetPerceptionUpdated.AddDynamic(this, &AAICharacterController::on_target_detected);
+
+		GetPerceptionComponent()->ConfigureSense(*sight_config);
+	}
+
+
+	// create and initialise hearing config object
+	hearing_config = CreateDefaultSubobject<UAISenseConfig_Hearing>(TEXT("Hearing config"));
+	if (hearing_config)
+	{
+		hearing_config->HearingRange = 3000.0f;
+
+
+		hearing_config->DetectionByAffiliation.bDetectEnemies =
+			hearing_config->DetectionByAffiliation.bDetectFriendlies =
+			hearing_config->DetectionByAffiliation.bDetectNeutrals = true;
+
+		// add sight configuration component to perception component
+		GetPerceptionComponent()->OnPerceptionUpdated.AddDynamic(this, &AAICharacterController::on_updated);
+		GetPerceptionComponent()->ConfigureSense(*hearing_config);
+	}
 	
+	//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Green, TEXT("Perception system updated"));
+
 }

@@ -4,6 +4,8 @@
 
 #include "CoreMinimal.h"
 #include "AIController.h"
+#include "BTDCharacter.h"
+#include "Perception/AIPerceptionTypes.h"
 #include "AICharacterController.generated.h"
 
 /**
@@ -15,34 +17,33 @@ class BTD_API AAICharacterController : public AAIController
 	GENERATED_BODY()
 
 public:
-	AAICharacterController();
+	AAICharacterController(FObjectInitializer const& object_initializer = FObjectInitializer::Get());
 
 	virtual void BeginPlay() override;
-	virtual void OnPossess(APawn* InPawn) override;
+	virtual void OnPossess(APawn* const pawn) override;
+	class UBlackboardComponent* get_blackboard() const;
+
 	virtual void Tick(float deltaSeconds) override;
-	virtual FRotator GetControlRotation() const override;
+
+private:
+	UPROPERTY(EditInstanceOnly, BlueprintReadWrite, Category = "AI", meta = (AllowPrivateAccess = "true"))
+	class UBehaviorTreeComponent* behavior_tree_component;
+
+	UPROPERTY(EditInstanceOnly, BlueprintReadWrite, Category = "AI", meta = (AllowPrivateAccess = "true"))
+	class UBehaviorTree* btree;
+
+	class UBlackboardComponent* blackboard;
+
+	class UAISenseConfig_Sight* sight_config;
+
+	class UAISenseConfig_Hearing* hearing_config;
 
 	UFUNCTION()
-	void OnPawnDetected(const TArray<AActor*> &detectedPawns);
+	void on_target_detected(AActor* actor, FAIStimulus const stimulus);
 
-	//How far the AI can see in a circle around it.
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "AI")
-	float sightRadius = 1500.0f;
+	UFUNCTION()
+	void on_updated(TArray<AActor*> const& updated_actors);
 
-	//How long an object is kept in memory after it is detected
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "AI")
-	float sightAge = 5.0f;
+	void setup_perception_system();
 
-	//AI loses right after being 50 units out of sightRadius
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "AI")
-	float loseSightRadius = sightRadius + 200.0f;
-
-	//FOV of the AI in degrees
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "AI")
-	float fov = 110.0f;
-
-	//Forward declaration of Unreal AI sight component
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "AI")
-	class UAISenseConfig_Sight* sightConfig;
-	
 };
