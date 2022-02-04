@@ -86,6 +86,9 @@ protected:
 	//from ROF
 	float TimeBetweenShots;
 
+	UPROPERTY(EditDefaultsOnly, Category = "Weapon", meta = (ClampMin=0.0f))
+	float BulletSpread;
+
 	void PlayFireEffects(FVector TraceEnd);
 
 	void PlayImpactEffects(EPhysicalSurface SurfaceType, FVector ImpactPoint);

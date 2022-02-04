@@ -30,6 +30,8 @@ AWeapon::AWeapon()
 
 	RateOfFire = 600;
 
+	BulletSpread = 2.0f;
+
 	SetReplicates(true);
 
 	NetUpdateFrequency = 66.0f;
@@ -61,8 +63,12 @@ void AWeapon::Fire()
 
 		FVector ShotDirection = EyeRotation.Vector();
 
+		//bullet spread
+		float HalfRad = FMath::DegreesToRadians(BulletSpread);
+		ShotDirection = FMath::VRandCone(ShotDirection, HalfRad, HalfRad);
+
 		//set the trace end location
-		FVector TraceEnd = EyeLocation + (EyeRotation.Vector() * 10000);
+		FVector TraceEnd = EyeLocation + (ShotDirection * 10000);
 
 		//add optional line trace query params
 		FCollisionQueryParams QueryParams;
