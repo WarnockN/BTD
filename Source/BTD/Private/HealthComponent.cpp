@@ -2,6 +2,8 @@
 
 
 #include "HealthComponent.h"
+
+#include "HordeGameMode.h"
 #include "GameFramework/GameModeBase.h"
 #include "Net/UnrealNetwork.h"
 
@@ -11,8 +13,10 @@ UHealthComponent::UHealthComponent()
 	DefaultHealth = 100.0f;
 
 	SetIsReplicatedByDefault(true);
-}
 
+	//setting this to maximum cause why not, can override in editor anyway
+	TeamNum = 255;
+}
 
 // Called when the game starts
 void UHealthComponent::BeginPlay()
@@ -42,7 +46,12 @@ void UHealthComponent::OnRep_Health(float OldHealth)
 void UHealthComponent::HandleTakeAnyDamage(AActor* DamagedActor, float Damage, const class UDamageType* DamageType,
                                            class AController* InstigatedBy, AActor* DamageCuaser)
 {
-	if (Damage <= 0.0f)
+	if (Damage <= 0.0f )
+	{
+		return;
+	}
+
+	if (DamageCuaser != DamagedActor && IsFriendly(DamagedActor, DamageCuaser))
 	{
 		return;
 	}
@@ -53,6 +62,26 @@ void UHealthComponent::HandleTakeAnyDamage(AActor* DamagedActor, float Damage, c
 	UE_LOG(LogTemp, Log, TEXT("Health changed: %s"), *FString::SanitizeFloat(Health));
 
 	OnHealthChanged.Broadcast(this, Health, Damage, DamageType, InstigatedBy, DamageCuaser);
+}
+
+bool UHealthComponent::IsFriendly(AActor* ActorA, AActor* ActorB)
+{
+	if (ActorA == nullptr || ActorB == nullptr)
+	{
+		//assume friendly
+		return true;
+	}
+	
+	UHealthComponent* HealthCompA = Cast<UHealthComponent>(ActorA->GetComponentByClass(UHealthComponent::StaticClass()));
+	UHealthComponent* HealthCompB = Cast<UHealthComponent>(ActorB->GetComponentByClass(UHealthComponent::StaticClass()));
+
+	if (HealthCompA == nullptr || HealthCompB == nullptr)
+	{
+		//assume friendly
+		return true;
+	}
+
+	return HealthCompA->TeamNum == HealthCompB->TeamNum;
 }
 
 void UHealthComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
