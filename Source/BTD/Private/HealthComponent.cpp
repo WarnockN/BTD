@@ -6,6 +6,7 @@
 #include "HordeGameMode.h"
 #include "GameFramework/GameModeBase.h"
 #include "Net/UnrealNetwork.h"
+#include "Windows/AllowWindowsPlatformTypes.h"
 
 // Sets default values for this component's properties
 UHealthComponent::UHealthComponent()
@@ -68,20 +69,21 @@ bool UHealthComponent::IsFriendly(AActor* ActorA, AActor* ActorB)
 {
 	if (ActorA == nullptr || ActorB == nullptr)
 	{
-		//assume friendly
+		// Assume Friendly
 		return true;
 	}
-	
+
 	UHealthComponent* HealthCompA = Cast<UHealthComponent>(ActorA->GetComponentByClass(UHealthComponent::StaticClass()));
 	UHealthComponent* HealthCompB = Cast<UHealthComponent>(ActorB->GetComponentByClass(UHealthComponent::StaticClass()));
 
 	if (HealthCompA == nullptr || HealthCompB == nullptr)
 	{
-		//assume friendly
+		// Assume friendly
 		return true;
 	}
 
-	return HealthCompA->TeamNum == HealthCompB->TeamNum;
+	if (HealthCompA->TeamNum == HealthCompB->TeamNum) return true;
+	return false;
 }
 
 void UHealthComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
