@@ -48,7 +48,7 @@ void AWeapon::BeginPlay()
 
 void AWeapon::Fire()
 {
-	if (GetLocalRole() < ROLE_Authority)
+	if (!HasAuthority())
 	{
 		ServerFire();
 	}
@@ -119,7 +119,7 @@ void AWeapon::Fire()
 		
 		PlayFireEffects(TracerEndPoint);
 
-		if (GetLocalRole() == ROLE_Authority)
+		if (HasAuthority())
 		{
 			HitscanTrace.TraceEnd = TracerEndPoint;
 			HitscanTrace.SurfaceType = SurfaceType;
