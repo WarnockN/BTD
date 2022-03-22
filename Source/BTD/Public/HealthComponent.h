@@ -28,7 +28,7 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "HealthComponent")
 	uint8 TeamNum;
 
-	UFUNCTION(BlueprintCallable, Category = "HealthComponent")
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "HealthComponent")
 	static bool IsFriendly(AActor* ActorA, AActor* ActorB);
 
 	

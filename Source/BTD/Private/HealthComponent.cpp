@@ -51,6 +51,11 @@ void UHealthComponent::HandleTakeAnyDamage(AActor* DamagedActor, float Damage, c
 	{
 		return;
 	}
+	
+	if (IsFriendly(DamagedActor, DamageCuaser))
+	{
+		return;
+	}
 
 	if (DamageCuaser != DamagedActor && IsFriendly(DamagedActor, DamageCuaser))
 	{
@@ -82,8 +87,7 @@ bool UHealthComponent::IsFriendly(AActor* ActorA, AActor* ActorB)
 		return true;
 	}
 
-	if (HealthCompA->TeamNum == HealthCompB->TeamNum) return true;
-	return false;
+	return HealthCompA->TeamNum == HealthCompB->TeamNum;
 }
 
 void UHealthComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
