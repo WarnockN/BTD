@@ -8,6 +8,7 @@
 
 class USphereComponent;
 class UDecalComponent;
+class APowerupActor;
 
 UCLASS()
 class BTD_API APickupActor : public AActor
@@ -30,7 +31,19 @@ protected:
 
 	UPROPERTY(VisibleAnywhere, Category = "Components")
 	UDecalComponent* DecalComp;
-public:
+
+	UPROPERTY(EditDefaultsOnly, Category = "PickupActor")
+	TSubclassOf<APowerupActor> PowerupClass;
+
+	APowerupActor* PowerupInstance;
+
+	UPROPERTY(EditDefaultsOnly, Category = "PickupActor")
+	float CooldownDuration;
+
+	FTimerHandle TimerHandle_RespawnTimer;
+
+	UFUNCTION()
+	void Respawn();
 	
 
 };

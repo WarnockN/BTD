@@ -20,9 +20,11 @@ void APowerupActor::BeginPlay()
 
 void APowerupActor::ActivatePowerup()
 {
+	OnActivated();
+	
 	if (PowerupInterval > 0)
 	{
-		GetWorldTimerManager().SetTimer(TimerHandle_PowerupTick, this, &APowerupActor::OnTickPowerup, PowerupInterval, true, 0.0f);
+		GetWorldTimerManager().SetTimer(TimerHandle_PowerupTick, this, &APowerupActor::OnTickPowerup, PowerupInterval, true);
 	}
 	else
 	{
