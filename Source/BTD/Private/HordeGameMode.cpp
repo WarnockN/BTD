@@ -70,6 +70,8 @@ void AHordeGameMode::GameOver()
 	UE_LOG(LogTemp, Log, TEXT("Game over, all palyers died!"));
 
 	SetWaveState(EWaveState::GameOver);
+
+	
 }
 
 void AHordeGameMode::PrepareForNextWave()
@@ -115,6 +117,8 @@ void AHordeGameMode::CheckWaveState()
 
 		SetWaveState(EWaveState::WaveComplete);
 		PrepareForNextWave();
+
+		//ADD END GAME FUNCTION HERE?
 	}
 	
 }
