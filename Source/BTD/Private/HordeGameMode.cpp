@@ -67,11 +67,9 @@ void AHordeGameMode::GameOver()
 	EndWave();
 
 	// @TODO: Finish up match, present game over to player
-	UE_LOG(LogTemp, Log, TEXT("Game over, all palyers died!"));
+	UE_LOG(LogTemp, Log, TEXT("Game over!"));
 
 	SetWaveState(EWaveState::GameOver);
-
-	
 }
 
 void AHordeGameMode::PrepareForNextWave()
@@ -81,6 +79,12 @@ void AHordeGameMode::PrepareForNextWave()
 	SetWaveState(EWaveState::WaitingToStart);
 
 	RestartDeadPlayers();
+
+	//ADD END GAME FUNCTION HERE?
+	if (WaveCount > MaxWaveCount)
+	{
+		GameOver();
+	}
 }
 
 void AHordeGameMode::CheckWaveState()
@@ -114,11 +118,8 @@ void AHordeGameMode::CheckWaveState()
 
 	if (!bIsAnyBotAlive)
 	{
-
 		SetWaveState(EWaveState::WaveComplete);
 		PrepareForNextWave();
-
-		//ADD END GAME FUNCTION HERE?
 	}
 	
 }
