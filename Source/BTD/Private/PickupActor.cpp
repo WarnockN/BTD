@@ -19,6 +19,10 @@ APickupActor::APickupActor()
 	DecalComp->DecalSize = FVector(64, 75, 75);
 	DecalComp->SetupAttachment(RootComponent);
 
+	CooldownDuration = 10.0f;
+
+	SetReplicates(true);
+
 }
 
 // Called when the game starts or when spawned
@@ -26,7 +30,11 @@ void APickupActor::BeginPlay()
 {
 	Super::BeginPlay();
 
-	Respawn();
+	if (HasAuthority())
+	{
+		Respawn();
+	}
+	
 }
 
 void APickupActor::Respawn()
@@ -48,9 +56,9 @@ void APickupActor::NotifyActorBeginOverlap(AActor* OtherActor)
 	Super::NotifyActorBeginOverlap(OtherActor);
 
 	//Grant powerup to player if available
-	if (PowerupInstance)
+	if (HasAuthority() && PowerupInstance)
 	{
-		PowerupInstance->ActivatePowerup();
+		PowerupInstance->ActivatePowerup(OtherActor);
 		PowerupInstance = nullptr;
 
 		//Set timer to respawn
