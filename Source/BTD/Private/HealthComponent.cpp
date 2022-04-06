@@ -70,6 +70,18 @@ void UHealthComponent::HandleTakeAnyDamage(AActor* DamagedActor, float Damage, c
 	OnHealthChanged.Broadcast(this, Health, Damage, DamageType, InstigatedBy, DamageCuaser);
 }
 
+void UHealthComponent::Heal(float HealAmount)
+{
+	if (HealAmount <= 0.0f || Health <= 0.0f) return;
+
+	Health = FMath::Clamp(Health + HealAmount, 0.0f, DefaultHealth);
+
+	UE_LOG(LogTemp, Log, TEXT("Health changed: %s (+%s)"), *FString::SanitizeFloat(Health), *FString::SanitizeFloat(HealAmount));
+
+	OnHealthChanged.Broadcast(this, Health, -HealAmount, nullptr, nullptr, nullptr);
+
+}
+
 bool UHealthComponent::IsFriendly(AActor* ActorA, AActor* ActorB)
 {
 	if (ActorA == nullptr || ActorB == nullptr)
