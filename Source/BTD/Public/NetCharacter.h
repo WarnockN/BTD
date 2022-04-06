@@ -64,11 +64,7 @@ protected:
 
 	UPROPERTY(VisibleDefaultsOnly, Category = "Player")
 	FName WeaponSocketName;
-
-	void StartFire();
-
-	void EndFire();
-
+	
 	UFUNCTION()
 	void OnHealthChanged(UHealthComponent* OwningHealthComp, float Health,
 						float HealthDelta, const UDamageType* DamageType,
@@ -86,5 +82,11 @@ public:
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
 	virtual FVector GetPawnViewLocation() const override;
+
+	UFUNCTION(BlueprintCallable, Category = "Player")
+	void StartFire();
+
+	UFUNCTION(BlueprintCallable, Category = "Player")
+	void EndFire();
 
 };

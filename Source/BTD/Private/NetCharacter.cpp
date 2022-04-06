@@ -63,7 +63,7 @@ void ANetCharacter::BeginPlay()
 
 
 
-
+	
 // Called every frame
 void ANetCharacter::Tick(float DeltaTime)
 {
@@ -136,7 +136,14 @@ void ANetCharacter::OnHealthChanged(UHealthComponent* OwningHealthComp, float He
 
 		DetachFromControllerPendingDestroy();
 
-		SetLifeSpan(10.0f);
+		SetLifeSpan(3.0f);
+
+		if (CurrWeapon)
+		{
+			CurrWeapon->EndFire();
+			CurrWeapon->SetLifeSpan(3.0f);
+		}
+		
 	}
 }
 

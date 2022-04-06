@@ -25,9 +25,22 @@ public:
 
 	float GetHealth() const { return Health; }
 
+	UFUNCTION(BlueprintCallable, Category = "HealthComponent")
+	void Heal(float HealAmount);
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "HealthComponent")
+	uint8 TeamNum;
+
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "HealthComponent")
+	static bool IsFriendly(AActor* ActorA, AActor* ActorB);
+
+	
+
 protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;
+
+	bool bIsDead;
 
 	UPROPERTY(ReplicatedUsing=OnRep_Health, BlueprintReadOnly, Category = "HealthComponent")
 	float Health;

@@ -2,8 +2,11 @@
 
 
 #include "HealthComponent.h"
+
+#include "HordeGameMode.h"
 #include "GameFramework/GameModeBase.h"
 #include "Net/UnrealNetwork.h"
+#include "Windows/AllowWindowsPlatformTypes.h"
 
 // Sets default values for this component's properties
 UHealthComponent::UHealthComponent()
@@ -11,8 +14,10 @@ UHealthComponent::UHealthComponent()
 	DefaultHealth = 100.0f;
 
 	SetIsReplicatedByDefault(true);
-}
 
+	//setting this to maximum cause why not, can override in editor anyway
+	TeamNum = 255;
+}
 
 // Called when the game starts
 void UHealthComponent::BeginPlay()
@@ -42,7 +47,17 @@ void UHealthComponent::OnRep_Health(float OldHealth)
 void UHealthComponent::HandleTakeAnyDamage(AActor* DamagedActor, float Damage, const class UDamageType* DamageType,
                                            class AController* InstigatedBy, AActor* DamageCuaser)
 {
-	if (Damage <= 0.0f)
+	if (Damage <= 0.0f )
+	{
+		return;
+	}
+	
+	if (IsFriendly(DamagedActor, DamageCuaser))
+	{
+		return;
+	}
+
+	if (DamageCuaser != DamagedActor && IsFriendly(DamagedActor, DamageCuaser))
 	{
 		return;
 	}
@@ -53,6 +68,38 @@ void UHealthComponent::HandleTakeAnyDamage(AActor* DamagedActor, float Damage, c
 	UE_LOG(LogTemp, Log, TEXT("Health changed: %s"), *FString::SanitizeFloat(Health));
 
 	OnHealthChanged.Broadcast(this, Health, Damage, DamageType, InstigatedBy, DamageCuaser);
+}
+
+void UHealthComponent::Heal(float HealAmount)
+{
+	if (HealAmount <= 0.0f || Health <= 0.0f) return;
+
+	Health = FMath::Clamp(Health + HealAmount, 0.0f, DefaultHealth);
+
+	UE_LOG(LogTemp, Log, TEXT("Health changed: %s (+%s)"), *FString::SanitizeFloat(Health), *FString::SanitizeFloat(HealAmount));
+
+	OnHealthChanged.Broadcast(this, Health, -HealAmount, nullptr, nullptr, nullptr);
+
+}
+
+bool UHealthComponent::IsFriendly(AActor* ActorA, AActor* ActorB)
+{
+	if (ActorA == nullptr || ActorB == nullptr)
+	{
+		// Assume Friendly
+		return true;
+	}
+
+	UHealthComponent* HealthCompA = Cast<UHealthComponent>(ActorA->GetComponentByClass(UHealthComponent::StaticClass()));
+	UHealthComponent* HealthCompB = Cast<UHealthComponent>(ActorB->GetComponentByClass(UHealthComponent::StaticClass()));
+
+	if (HealthCompA == nullptr || HealthCompB == nullptr)
+	{
+		// Assume friendly
+		return true;
+	}
+
+	return HealthCompA->TeamNum == HealthCompB->TeamNum;
 }
 
 void UHealthComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const

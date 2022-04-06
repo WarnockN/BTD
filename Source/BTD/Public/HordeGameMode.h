@@ -55,6 +55,9 @@ protected:
 	int32 WaveCount = 0;
 
 	UPROPERTY(EditDefaultsOnly, Category = "GameMode")
+	int32 MaxWaveCount = 3;
+
+	UPROPERTY(EditDefaultsOnly, Category = "GameMode")
 	float TimeBetweenWaves;
 
 	
