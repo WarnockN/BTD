@@ -35,6 +35,7 @@ protected:
 	UPROPERTY(EditInstanceOnly, Category = "PickupActor")
 	TSubclassOf<APowerupActor> PowerupClass;
 
+	//individual Instance of the pickup actor in the level
 	APowerupActor* PowerupInstance;
 
 	UPROPERTY(EditInstanceOnly, Category = "PickupActor")

@@ -42,6 +42,7 @@ void APowerupActor::ActivatePowerup(AActor* ActiveFor)
 
 void APowerupActor::OnTickPowerup()
 {
+	//increase ticks
 	TicksProcessed++;
 
 	OnPowerupTicked();

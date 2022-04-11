@@ -41,6 +41,7 @@ protected:
 	/* Total number of ticks applied */
 	int32 TicksProcessed;
 
+	//timer to handle powerup ticking
 	FTimerHandle TimerHandle_PowerupTick;
 
 	UFUNCTION()

@@ -37,6 +37,7 @@ void APickupActor::BeginPlay()
 	
 }
 
+//respawn pickup actor
 void APickupActor::Respawn()
 {
 	if (PowerupClass == nullptr)

@@ -39,7 +39,7 @@ void AHordeGameMode::StartWave()
 
 	UE_LOG(LogTemp, Error, TEXT("Wave number: %i"), WaveCount);
 	
-	NumBotsToSpawn = 2 * WaveCount;
+	NumBotsToSpawn = 4 * WaveCount;
 	
 	GetWorldTimerManager().SetTimer(BotSpawnTimerHandle, this, &AHordeGameMode::SpawnBotTimerElapsed, 1.0f, true, 0.0f);
 
