@@ -4,7 +4,6 @@
 #include "HealthComponent.h"
 
 #include "HordeGameMode.h"
-#include "GameFramework/GameModeBase.h"
 #include "Net/UnrealNetwork.h"
 #include "Windows/AllowWindowsPlatformTypes.h"
 
@@ -17,6 +16,8 @@ UHealthComponent::UHealthComponent()
 
 	//setting this to maximum cause why not, can override in editor anyway
 	TeamNum = 255;
+
+	bIsDead = false;
 }
 
 // Called when the game starts
@@ -47,7 +48,7 @@ void UHealthComponent::OnRep_Health(float OldHealth)
 void UHealthComponent::HandleTakeAnyDamage(AActor* DamagedActor, float Damage, const class UDamageType* DamageType,
                                            class AController* InstigatedBy, AActor* DamageCuaser)
 {
-	if (Damage <= 0.0f )
+	if (Damage <= 0.0f || bIsDead)
 	{
 		return;
 	}
@@ -67,7 +68,19 @@ void UHealthComponent::HandleTakeAnyDamage(AActor* DamagedActor, float Damage, c
 
 	UE_LOG(LogTemp, Log, TEXT("Health changed: %s"), *FString::SanitizeFloat(Health));
 
+	bIsDead = Health <= 0.0f;
+
 	OnHealthChanged.Broadcast(this, Health, Damage, DamageType, InstigatedBy, DamageCuaser);
+
+	if (bIsDead)
+	{
+		AHordeGameMode* GM = Cast<AHordeGameMode>(GetWorld()->GetAuthGameMode());
+		if (GM)
+		{
+			GM->OnActorKilled.Broadcast(GetOwner(), DamageCuaser);
+		}
+	}
+	
 }
 
 void UHealthComponent::Heal(float HealAmount)

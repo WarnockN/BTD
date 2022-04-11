@@ -7,12 +7,14 @@
 #include "TimerManager.h"
 #include "EngineUtils.h"
 #include "HordeGameState.h"
+#include "NetPlayerState.h"
 #include "Kismet/GameplayStatics.h"
 
 AHordeGameMode::AHordeGameMode()
 {
 	TimeBetweenWaves = 2.0f;
 	GameStateClass = AHordeGameState::StaticClass();
+	PlayerStateClass = ANetPlayerState::StaticClass(); 
 
 	PrimaryActorTick.bCanEverTick = true;
 	PrimaryActorTick.TickInterval = 1.0f;
