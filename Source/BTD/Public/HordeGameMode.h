@@ -34,6 +34,7 @@ protected:
 	//stop spawn bots
 	void EndWave();
 
+    UFUNCTION(BlueprintCallable, Category = "GameMode")
 	void GameOver();
 
 	//set timer for next wave
