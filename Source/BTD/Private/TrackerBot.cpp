@@ -97,7 +97,7 @@ FVector ATrackerBot::GetNextPathPoint()
 	//get player location hack
 	ACharacter* NetCharacter = UGameplayStatics::GetPlayerCharacter(this, 0);
 
-	//return next pointin path
+	//return next point in path
 	UNavigationPath* NavPath = UNavigationSystemV1::FindPathToActorSynchronously(this, GetActorLocation(), NetCharacter);
 	if (NavPath && NavPath->PathPoints.Num() > 1)
 	{
@@ -118,6 +118,7 @@ void ATrackerBot::SelfDestruct()
 	bExploded = true;
 	
 	UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), ExplosionEffect, GetActorLocation());
+	UGameplayStatics::PlaySound2D(GetWorld(), ExplodeSound);
 
 	MeshComp->SetVisibility(false, true);
 	MeshComp->SetCollisionEnabled(ECollisionEnabled::NoCollision);
@@ -131,8 +132,6 @@ void ATrackerBot::SelfDestruct()
 		UGameplayStatics::ApplyRadialDamage(this, ExplosionDamage, GetActorLocation(), ExplosionRadius, nullptr, IgnoredActors, this, GetInstigatorController(), true);
 
 		DrawDebugSphere(GetWorld(), GetActorLocation(), ExplosionRadius, 12, FColor::Red, false, 2.0f, 0, 1.0f);
-
-		UGameplayStatics::PlaySoundAtLocation(this, ExplodeSound, GetActorLocation());
 		
 		SetLifeSpan(2.0f);
 	}
@@ -190,7 +189,7 @@ void ATrackerBot::NotifyActorBeginOverlap(AActor* OtherActor)
 	{
 		ANetCharacter* NetCharacter = Cast<ANetCharacter>(OtherActor);
 
-		if (NetCharacter)
+		if (NetCharacter && !UHealthComponent::IsFriendly(OtherActor, this))
 		{
 			// overlapped with a player
 
