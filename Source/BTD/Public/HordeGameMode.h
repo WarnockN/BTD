@@ -14,6 +14,8 @@
 
 enum class EWaveState : uint8;
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnActorKilled, AActor*, VictimActor, AActor*, KillerActor); // KILLED actor, killer actor, 
+
 UCLASS()
 class BTD_API AHordeGameMode : public AGameModeBase
 {
@@ -32,6 +34,7 @@ protected:
 	//stop spawn bots
 	void EndWave();
 
+    UFUNCTION(BlueprintCallable, Category = "GameMode")
 	void GameOver();
 
 	//set timer for next wave
@@ -67,4 +70,7 @@ public:
 	virtual void StartPlay() override;
 
 	virtual void Tick(float DeltaSeconds) override;
+
+	UPROPERTY(BlueprintAssignable, Category = "GameMode")
+	FOnActorKilled OnActorKilled;
 };

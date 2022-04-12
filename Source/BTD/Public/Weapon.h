@@ -6,6 +6,7 @@
 #include "GameFramework/Actor.h"
 #include "Weapon.generated.h"
 
+class USoundCue;
 class USkeletalMeshComponent;
 class UDamageType;
 class UParticleSystem;
@@ -94,4 +95,7 @@ protected:
 	void PlayImpactEffects(EPhysicalSurface SurfaceType, FVector ImpactPoint);
 
 	void Fire();
+
+	UPROPERTY(EditDefaultsOnly, Category = "Weapon")
+	USoundCue* FireSound;
 };

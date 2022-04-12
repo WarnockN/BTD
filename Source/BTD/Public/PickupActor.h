@@ -35,9 +35,10 @@ protected:
 	UPROPERTY(EditInstanceOnly, Category = "PickupActor")
 	TSubclassOf<APowerupActor> PowerupClass;
 
+	//individual Instance of the pickup actor in the level
 	APowerupActor* PowerupInstance;
 
-	UPROPERTY(EditDefaultsOnly, Category = "PickupActor")
+	UPROPERTY(EditInstanceOnly, Category = "PickupActor")
 	float CooldownDuration;
 
 	FTimerHandle TimerHandle_RespawnTimer;

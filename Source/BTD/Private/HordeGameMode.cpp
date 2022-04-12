@@ -7,12 +7,14 @@
 #include "TimerManager.h"
 #include "EngineUtils.h"
 #include "HordeGameState.h"
-#include "GameFramework/GameMode.h"
+#include "NetPlayerState.h"
+#include "Kismet/GameplayStatics.h"
 
 AHordeGameMode::AHordeGameMode()
 {
 	TimeBetweenWaves = 2.0f;
 	GameStateClass = AHordeGameState::StaticClass();
+	PlayerStateClass = ANetPlayerState::StaticClass(); 
 
 	PrimaryActorTick.bCanEverTick = true;
 	PrimaryActorTick.TickInterval = 1.0f;
@@ -36,8 +38,10 @@ void AHordeGameMode::Tick(float DeltaSeconds)
 void AHordeGameMode::StartWave()
 {
 	WaveCount++;
+
+	UE_LOG(LogTemp, Error, TEXT("Wave number: %i"), WaveCount);
 	
-	NumBotsToSpawn = 2 * WaveCount;
+	NumBotsToSpawn = 4 * WaveCount;
 	
 	GetWorldTimerManager().SetTimer(BotSpawnTimerHandle, this, &AHordeGameMode::SpawnBotTimerElapsed, 1.0f, true, 0.0f);
 
@@ -66,10 +70,14 @@ void AHordeGameMode::GameOver()
 {
 	EndWave();
 
-	// @TODO: Finish up match, present game over to player
 	UE_LOG(LogTemp, Log, TEXT("Game over!"));
 
 	SetWaveState(EWaveState::GameOver);
+
+	// @TODO: Finish up match, present game over to player
+	UGameplayStatics::OpenLevel(GetWorld(), "L_EndMenu");
+
+	
 }
 
 void AHordeGameMode::PrepareForNextWave()
@@ -79,12 +87,6 @@ void AHordeGameMode::PrepareForNextWave()
 	SetWaveState(EWaveState::WaitingToStart);
 
 	RestartDeadPlayers();
-
-	//ADD END GAME FUNCTION HERE?
-	if (WaveCount > MaxWaveCount)
-	{
-		GameOver();
-	}
 }
 
 void AHordeGameMode::CheckWaveState()
@@ -120,6 +122,8 @@ void AHordeGameMode::CheckWaveState()
 	{
 		SetWaveState(EWaveState::WaveComplete);
 		PrepareForNextWave();
+
+		if (WaveCount > MaxWaveCount) GameOver();
 	}
 	
 }
@@ -139,10 +143,11 @@ void AHordeGameMode::CheckAnyPlayerAlive()
 				//player is still alive
 				return;
 			}
-			//no player alive
-			GameOver();
 		}
 	}
+	
+	//no player alive
+	GameOver();
 }
 
 void AHordeGameMode::RestartDeadPlayers()
