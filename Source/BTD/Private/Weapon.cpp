@@ -2,6 +2,7 @@
 
 
 #include "Weapon.h"
+
 #include "DrawDebugHelpers.h"
 #include "BTD/BTD.h"
 #include "Kismet/GameplayStatics.h"
@@ -9,6 +10,7 @@
 #include "Particles/ParticleSystemComponent.h"
 #include "PhysicalMaterials/PhysicalMaterial.h"
 #include "Net/UnrealNetwork.h"
+#include "Sound/SoundCue.h"
 
 static int32 DebugWeaponDraw = 0;
 FAutoConsoleVariableRef CVARDebugWeaponDraw (
@@ -126,6 +128,8 @@ void AWeapon::Fire()
 		}
 
 		LastFireTime = GetWorld()->TimeSeconds;
+
+		UGameplayStatics::PlaySoundAtLocation(GetWorld(), FireSound, GetActorLocation());
 	}
 }
 
