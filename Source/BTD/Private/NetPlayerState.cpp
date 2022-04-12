@@ -5,5 +5,5 @@
 
 void ANetPlayerState::AddScore(float ScoreDelta)
 {
-	Score += ScoreDelta;
+	SetScore(GetScore() + ScoreDelta);
 }
