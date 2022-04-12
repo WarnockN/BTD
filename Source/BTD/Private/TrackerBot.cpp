@@ -153,9 +153,6 @@ void ATrackerBot::Tick(float DeltaTime)
 		if (DistanceToTarget <= RequiredDistanceToTarget)
 		{
 			NextPathPoint = GetNextPathPoint();
-
-			DrawDebugString(GetWorld(), GetActorLocation(), "Target reached!");
-		
 		}
 		else
 		{
